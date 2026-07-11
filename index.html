@@ -1,0 +1,4664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="OptiPrice AI - Enterprise Price Optimization & Causal Demand Simulation Engine. Maximize margins and model elasticity curves in real-time.">
+  <title>OptiPrice AI | Enterprise Price Optimization & Demand Simulation Engine</title>
+  
+  <!-- Typography & Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ----------------------------------------------------
+       1. DESIGN SYSTEM & ROOT TOKENS
+       ---------------------------------------------------- */
+    :root {
+      --navy: #01204E;
+      --navy-light: #0d2c5e;
+      --navy-dark: #001330;
+      --teal: #028391;
+      --teal-light: #03a8ba;
+      --teal-alpha: rgba(2, 131, 145, 0.15);
+      --cream: #F6DCAC;
+      --cream-dark: #e0c596;
+      --cream-alpha: rgba(246, 220, 172, 0.1);
+      --cream-light: #fff5e0;
+      --orange: #FAA968;
+      --orange-alpha: rgba(250, 169, 104, 0.15);
+      --flame: #F85525;
+      --flame-dark: #d63d11;
+      --flame-alpha: rgba(248, 85, 37, 0.15);
+      
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --transition-smooth: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --max-width: 1200px;
+    }
+
+    /* ----------------------------------------------------
+       2. RESET & BASE STYLES
+       ---------------------------------------------------- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--navy);
+      color: var(--cream);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    body {
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Accessibility Focus States */
+    *:focus-visible {
+      outline: 3px solid var(--flame);
+      outline-offset: 4px;
+    }
+
+    /* Selection Highlight */
+    ::selection {
+      background-color: var(--flame);
+      color: white;
+    }
+
+    /* ----------------------------------------------------
+       3. CUSTOM CURSOR
+       ---------------------------------------------------- */
+    .custom-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    
+    .cursor-dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background-color: var(--flame);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background-color 0.2s;
+    }
+    
+    .cursor-ring {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border: 1.5px solid var(--teal);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                  height 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                  border-color 0.2s, background-color 0.2s;
+    }
+    
+    .custom-cursor.hovering .cursor-dot {
+      width: 10px;
+      height: 10px;
+      background-color: var(--flame);
+    }
+    
+    .custom-cursor.hovering .cursor-ring {
+      width: 50px;
+      height: 50px;
+      border-color: var(--flame);
+      background-color: var(--flame-alpha);
+    }
+
+    @media (max-width: 1024px) {
+      .custom-cursor {
+        display: none;
+      }
+    }
+
+    /* ----------------------------------------------------
+       4. ANIMATED BACKGROUND BLOBS
+       ---------------------------------------------------- */
+    .blob-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    .blob {
+      position: absolute;
+      width: 45vw;
+      height: 45vw;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.12;
+      mix-blend-mode: screen;
+    }
+    
+    .blob-1 {
+      background: var(--teal);
+      top: -10%;
+      right: -5%;
+      animation: drift-1 30s infinite alternate ease-in-out;
+    }
+    
+    .blob-2 {
+      background: var(--orange);
+      top: 40%;
+      left: -15%;
+      animation: drift-2 35s infinite alternate ease-in-out;
+    }
+    
+    .blob-3 {
+      background: var(--flame);
+      bottom: -10%;
+      right: 15%;
+      animation: drift-3 28s infinite alternate ease-in-out;
+    }
+    
+    @keyframes drift-1 {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-10%, 15%) scale(1.15); }
+      100% { transform: translate(5%, -5%) scale(0.9); }
+    }
+    
+    @keyframes drift-2 {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(15%, -10%) scale(1.1); }
+      100% { transform: translate(-5%, 8%) scale(1.2); }
+    }
+
+    @keyframes drift-3 {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-5%, -15%) scale(0.95); }
+      100% { transform: translate(10%, 10%) scale(1.1); }
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .blob {
+        animation: none !important;
+      }
+    }
+
+    /* ----------------------------------------------------
+       5. LAYOUT UTILITIES
+       ---------------------------------------------------- */
+    .container {
+      width: 90%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      position: relative;
+      z-index: 10;
+    }
+    
+    section {
+      padding: 100px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .eyebrow {
+      font-family: var(--font-mono);
+      color: var(--orange);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+    
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 24px;
+      line-height: 1.15;
+    }
+    
+    .section-desc {
+      font-size: 1.1rem;
+      color: var(--cream-dark);
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    /* ----------------------------------------------------
+       6. BUTTONS & INTERACTIVE COMPONENT STYLES
+       ---------------------------------------------------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 28px;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: var(--transition-smooth);
+      cursor: pointer;
+      border: none;
+    }
+    
+    .btn-primary {
+      background-color: var(--flame);
+      color: white;
+      box-shadow: 0 4px 20px var(--flame-alpha);
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--flame-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(248, 85, 37, 0.3);
+    }
+    
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--cream);
+      border: 1px solid rgba(246, 220, 172, 0.3);
+      margin-left: 16px;
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--cream-alpha);
+      border-color: var(--cream);
+      transform: translateY(-2px);
+    }
+
+    /* ----------------------------------------------------
+       7. HEADER / NAVIGATION
+       ---------------------------------------------------- */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background-color: rgba(1, 32, 78, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(246, 220, 172, 0.08);
+      transition: var(--transition-smooth);
+    }
+    
+    header.scrolled {
+      padding: 12px 0;
+      background-color: rgba(1, 32, 78, 0.9);
+      box-shadow: 0 8px 32px rgba(0, 19, 48, 0.3);
+    }
+    
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      transition: var(--transition-smooth);
+    }
+    
+    header.scrolled .nav-container {
+      padding: 10px 0;
+    }
+    
+    .logo {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      color: var(--cream);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .logo span {
+      color: var(--teal);
+    }
+    
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 32px;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: var(--cream-dark);
+      transition: var(--transition-smooth);
+      position: relative;
+      padding: 6px 0;
+    }
+    
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1.5px;
+      background-color: var(--teal);
+      transition: var(--transition-smooth);
+    }
+    
+    .nav-links a:hover {
+      color: var(--cream);
+    }
+    
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-cta {
+      font-family: var(--font-mono) !important;
+      border: 1px solid var(--teal);
+      padding: 6px 14px !important;
+      border-radius: 4px;
+      color: var(--teal) !important;
+    }
+
+    .nav-cta:hover {
+      background-color: var(--teal-alpha);
+      color: var(--teal-light) !important;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--cream);
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      .menu-toggle {
+        display: block;
+      }
+    }
+
+    /* ----------------------------------------------------
+       8. HERO SECTION
+       ---------------------------------------------------- */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 140px;
+      padding-bottom: 80px;
+    }
+    
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 60px;
+      align-items: center;
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 10;
+    }
+    
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      font-weight: 700;
+      line-height: 1.05;
+      color: var(--cream);
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    .hero-title span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--cream);
+      background: linear-gradient(135deg, var(--teal) 0%, var(--orange) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--cream-dark);
+      margin-bottom: 40px;
+      max-width: 580px;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+    
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 60px;
+    }
+
+    /* Hero Stats Banner */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      border-top: 1px solid rgba(246, 220, 172, 0.1);
+      padding-top: 40px;
+    }
+    
+    .stat-card .stat-val {
+      font-family: var(--font-mono);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--teal);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .stat-val span {
+      color: var(--orange);
+    }
+    
+    .stat-card .stat-lbl {
+      font-size: 0.85rem;
+      color: var(--cream-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Hero Interactive Asset (Floating Mock Console) */
+    .hero-asset {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .console-frame {
+      width: 100%;
+      background: rgba(13, 44, 94, 0.4);
+      border: 1.5px solid rgba(246, 220, 172, 0.15);
+      border-radius: 12px;
+      padding: 24px;
+      font-family: var(--font-mono);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 50px rgba(0, 19, 48, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .console-frame::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--teal) 0%, var(--flame) 100%);
+    }
+
+    .console-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(246, 220, 172, 0.08);
+      padding-bottom: 12px;
+    }
+
+    .console-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .console-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: rgba(246, 220, 172, 0.2);
+    }
+    .console-dot:nth-child(1) { background-color: var(--flame); }
+    .console-dot:nth-child(2) { background-color: var(--orange); }
+    .console-dot:nth-child(3) { background-color: var(--teal); }
+
+    .console-title {
+      font-size: 0.75rem;
+      color: var(--cream-dark);
+      opacity: 0.7;
+    }
+
+    .console-body {
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--cream);
+    }
+
+    .console-line {
+      margin-bottom: 10px;
+      opacity: 0;
+      transform: translateY(4px);
+      animation: console-fade-in 0.5s forwards;
+    }
+
+    .console-line.success { color: var(--teal); }
+    .console-line.warn { color: var(--orange); }
+    .console-line.accent { color: var(--flame); }
+
+    @keyframes console-fade-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 991px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 50px;
+      }
+      .hero-title {
+        font-size: 3rem;
+      }
+      .hero-stats {
+        padding-bottom: 20px;
+      }
+    }
+
+    /* ----------------------------------------------------
+       9. MARQUEE TICKER
+       ---------------------------------------------------- */
+    .ticker-wrap {
+      width: 100%;
+      background-color: var(--navy-light);
+      border-top: 1px solid rgba(246, 220, 172, 0.08);
+      border-bottom: 1px solid rgba(246, 220, 172, 0.08);
+      padding: 18px 0;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      z-index: 10;
+    }
+
+    .ticker {
+      display: inline-block;
+      animation: marquee 25s linear infinite;
+    }
+
+    .ticker-item {
+      display: inline-block;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--cream);
+      padding: 0 30px;
+    }
+
+    .ticker-item span {
+      color: var(--teal);
+      margin-right: 12px;
+    }
+
+    @keyframes marquee {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+
+    /* ----------------------------------------------------
+       10. LIVE LAB - ELASTICITY SIMULATOR
+       ---------------------------------------------------- */
+    #live-lab {
+      background-color: var(--navy-dark);
+      border-bottom: 1px solid rgba(246, 220, 172, 0.05);
+    }
+    
+    .lab-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1.3fr;
+      gap: 40px;
+      align-items: stretch;
+      margin-top: 40px;
+    }
+
+    /* Control Panel */
+    .lab-controls {
+      background: var(--navy-light);
+      border: 1px solid rgba(246, 220, 172, 0.1);
+      border-radius: 12px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .control-header {
+      border-bottom: 1px solid rgba(246, 220, 172, 0.08);
+      padding-bottom: 16px;
+    }
+
+    .control-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--cream);
+      margin-bottom: 4px;
+    }
+
+    .control-header p {
+      font-size: 0.85rem;
+      color: var(--cream-dark);
+      opacity: 0.8;
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .slider-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
+    .slider-label {
+      color: var(--cream-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slider-value {
+      color: var(--teal);
+      font-weight: 700;
+    }
+
+    .slider-value.flame-color {
+      color: var(--flame);
+    }
+
+    /* Custom range input styling */
+    .slider-group input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(to right, var(--teal) 0%, var(--teal) var(--value-pct, 0%), rgba(246, 220, 172, 0.15) var(--value-pct, 0%), rgba(246, 220, 172, 0.15) 100%);
+      outline: none;
+      transition: background 0.1s;
+    }
+
+    .slider-group.active-slider input[type="range"] {
+      background: linear-gradient(to right, var(--flame) 0%, var(--flame) var(--value-pct, 0%), rgba(246, 220, 172, 0.15) var(--value-pct, 0%), rgba(246, 220, 172, 0.15) 100%);
+    }
+
+    .slider-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--teal);
+      cursor: pointer;
+      transition: transform 0.15s, background-color 0.15s;
+      border: 2px solid var(--navy-light);
+    }
+
+    .slider-group input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background: var(--teal-light);
+    }
+
+    /* Flame slider for price adjustment */
+    .slider-group.active-slider input[type="range"]::-webkit-slider-thumb {
+      background: var(--flame);
+    }
+    .slider-group.active-slider input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--flame-dark);
+    }
+
+    .lab-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .metric-box {
+      background: rgba(1, 32, 78, 0.5);
+      border: 1px solid rgba(246, 220, 172, 0.05);
+      border-radius: 8px;
+      padding: 16px;
+      position: relative;
+    }
+
+    .metric-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--cream-dark);
+      opacity: 0.7;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .metric-value {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--cream);
+    }
+
+    .metric-delta {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .delta-positive { color: var(--teal); }
+    .delta-negative { color: var(--flame); }
+
+    .optimization-card {
+      background: var(--teal-alpha);
+      border: 1px solid var(--teal);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .opt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--teal-light);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .opt-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .opt-value {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--cream);
+    }
+
+    .opt-desc {
+      font-size: 0.75rem;
+      color: var(--cream-dark);
+      opacity: 0.8;
+      line-height: 1.4;
+    }
+
+    /* Visualizer (Canvas Container) */
+    .lab-visualizer {
+      background: var(--navy-light);
+      border: 1px solid rgba(246, 220, 172, 0.1);
+      border-radius: 12px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .chart-container {
+      width: 100%;
+      flex-grow: 1;
+      min-height: 350px;
+      position: relative;
+    }
+
+    #elasticity-chart {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 6px;
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      border-top: 1px solid rgba(246, 220, 172, 0.08);
+      padding-top: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--cream-dark);
+    }
+
+    .legend-line {
+      width: 16px;
+      height: 3px;
+      border-radius: 1px;
+    }
+    
+    .line-demand { background-color: var(--teal); }
+    .line-profit { background-color: var(--orange); height: 2px; border-top: 1.5px dashed var(--orange); background: none; }
+    .line-current { background-color: var(--flame); }
+    .line-optimal { background-color: var(--cream); height: 2px; border-top: 1.5px dashed var(--cream); background: none; }
+
+    .reset-btn {
+      align-self: flex-start;
+      background: none;
+      border: 1px solid rgba(246, 220, 172, 0.2);
+      color: var(--cream);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .reset-btn:hover {
+      background: var(--cream-alpha);
+      border-color: var(--cream);
+    }
+
+    /* Segmented Controls & Toggles */
+    .segmented-control {
+      display: inline-flex;
+      background: rgba(1, 32, 78, 0.4);
+      border: 1px solid rgba(246, 220, 172, 0.12);
+      border-radius: 6px;
+      padding: 3px;
+      width: fit-content;
+      gap: 2px;
+    }
+    
+    .segmented-control .segment-btn {
+      background: none;
+      border: none;
+      color: var(--cream-dark);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    
+    .segmented-control .segment-btn:hover {
+      color: var(--cream);
+      background: rgba(246, 220, 172, 0.04);
+    }
+    
+    .segmented-control .segment-btn.active {
+      background: var(--teal);
+      color: var(--navy-dark);
+      font-weight: 700;
+    }
+    
+    .toggle-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .toggle-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--cream-dark);
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    /* Visualizer Header */
+    .visualizer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(246, 220, 172, 0.08);
+      padding-bottom: 12px;
+      margin-bottom: 8px;
+    }
+    
+    .visualizer-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--cream);
+    }
+    
+    /* API Playground */
+    .api-playground {
+      margin-top: 40px;
+      padding: 28px;
+      background: var(--navy-light);
+      border: 1px solid rgba(246, 220, 172, 0.1);
+      border-radius: 12px;
+    }
+    
+    .api-playground-header {
+      border-bottom: 1px solid rgba(246, 220, 172, 0.08);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .api-playground-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--cream);
+      margin-bottom: 4px;
+    }
+    
+    .api-playground-header p {
+      font-size: 0.85rem;
+      color: var(--cream-dark);
+      opacity: 0.8;
+    }
+    
+    .api-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 32px;
+    }
+    
+    .api-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .api-panel h4 {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      color: var(--cream);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    
+    .api-request-info {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: rgba(1, 32, 78, 0.4);
+      border: 1px solid rgba(246, 220, 172, 0.06);
+      border-radius: 6px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .api-method {
+      background: var(--teal-alpha);
+      color: var(--teal-light);
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.7rem;
+    }
+    
+    .api-url {
+      color: var(--cream-dark);
+      word-break: break-all;
+    }
+    
+    .code-block {
+      background: #011627;
+      border: 1px solid rgba(246, 220, 172, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #addb67;
+      overflow-x: auto;
+      min-height: 180px;
+      line-height: 1.6;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Integration / Process grid extensions */
+    .integration-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      margin-top: 40px;
+      align-items: start;
+    }
+    
+    /* Prevent grid items from expanding beyond track widths */
+    .integration-grid > div,
+    .lab-grid > div,
+    .api-grid > div,
+    .projects-grid > div {
+      min-width: 0;
+    }
+    
+    .process-timeline-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      position: relative;
+    }
+    
+    .process-timeline-vertical::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      bottom: 10px;
+      width: 1.5px;
+      background-color: rgba(2, 131, 145, 0.2);
+    }
+    
+    .process-step-vertical {
+      display: flex;
+      gap: 24px;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .step-num-vertical {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--navy-dark);
+      background: var(--cream);
+      border: 2px solid var(--teal);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 4px var(--cream);
+    }
+    
+    .step-content-vertical {
+      padding-top: 6px;
+    }
+    
+    .step-content-vertical .step-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    
+    .step-content-vertical .step-desc {
+      font-size: 0.88rem;
+      color: var(--navy-light);
+      opacity: 0.85;
+      line-height: 1.5;
+    }
+    
+    .schema-mapper-container {
+      position: sticky;
+      top: 100px;
+    }
+    
+    .schema-mapper-card {
+      background: #fff;
+      border: 1px solid rgba(1, 32, 78, 0.1);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(1, 32, 78, 0.04);
+    }
+    
+    .schema-mapper-card h4 {
+      font-family: var(--font-display);
+      color: var(--navy);
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+    
+    .schema-mapping-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: rgba(1, 32, 78, 0.02);
+      border: 1px solid rgba(1, 32, 78, 0.05);
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      transition: var(--transition-smooth);
+      cursor: pointer;
+    }
+    
+    .schema-mapping-row:hover, .schema-mapping-row.active {
+      border-color: var(--teal);
+      background: rgba(2, 131, 145, 0.03);
+      box-shadow: 0 2px 10px rgba(2, 131, 145, 0.05);
+      transform: translateY(-1px);
+    }
+    
+    .schema-source {
+      color: var(--navy-light);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-grow: 1;
+      flex-shrink: 1;
+      min-width: 0;
+    }
+    
+    .schema-arrow {
+      color: var(--teal);
+      font-weight: 700;
+      margin: 0 12px;
+      flex-shrink: 0;
+    }
+    
+    .schema-target {
+      color: var(--orange);
+      font-weight: 700;
+      background: rgba(250, 169, 104, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    
+    .schema-mapper-preview {
+      margin-top: 20px;
+      border-top: 1px dashed rgba(1, 32, 78, 0.1);
+      padding-top: 16px;
+    }
+    
+    .mapper-preview-header {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      color: var(--navy-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    #mapper-preview-code {
+      background: #011627;
+      color: #addb67;
+      border-radius: 6px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      margin: 0;
+      overflow-x: auto;
+      max-height: 120px;
+    }
+
+    @media (max-width: 991px) {
+      .lab-grid, .integration-grid {
+        grid-template-columns: 1fr;
+      }
+      .chart-container {
+        min-height: 280px;
+      }
+      .schema-mapper-container {
+        position: relative;
+        top: 0;
+      }
+    }
+
+    /* ----------------------------------------------------
+       11. PROJECT SHOWCASE GRID
+       ---------------------------------------------------- */
+    #projects {
+      background-color: var(--navy);
+    }
+    
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .project-card {
+      background: var(--navy-light);
+      border: 1.5px solid rgba(246, 220, 172, 0.08);
+      border-radius: 12px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      position: relative;
+      transition: transform 0.15s ease-out, border-color 0.3s;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .project-card:hover {
+      border-color: var(--teal);
+    }
+
+    .project-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--orange);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .project-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 14px;
+      line-height: 1.25;
+    }
+
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--cream-dark);
+      opacity: 0.9;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* Inline chart graphics for projects */
+    .project-graphics {
+      background: rgba(1, 32, 78, 0.4);
+      border: 1px solid rgba(246, 220, 172, 0.05);
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 110px;
+    }
+
+    .project-chart {
+      width: 100%;
+      height: 100%;
+    }
+
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .tech-badge {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      background: rgba(246, 220, 172, 0.05);
+      border: 1px solid rgba(246, 220, 172, 0.15);
+      color: var(--cream-dark);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 991px) {
+      .projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ----------------------------------------------------
+       12. PROCESS SECTION (LIGHT THEME CONTRAST)
+       ---------------------------------------------------- */
+    #process {
+      background-color: var(--cream);
+      color: var(--navy);
+      border-top: 1px solid rgba(1, 32, 78, 0.1);
+      border-bottom: 1px solid rgba(1, 32, 78, 0.1);
+      position: relative;
+    }
+
+    #process .section-title {
+      color: var(--navy);
+    }
+
+    #process .section-desc {
+      color: var(--navy-light);
+    }
+
+    .process-timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+      margin-top: 50px;
+      position: relative;
+    }
+
+    .process-step {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--teal);
+      line-height: 1;
+    }
+
+    .step-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .step-desc {
+      font-size: 0.9rem;
+      color: var(--navy-light);
+      opacity: 0.85;
+      line-height: 1.5;
+    }
+
+    .process-line {
+      position: absolute;
+      top: 30px;
+      left: 10%;
+      width: 80%;
+      height: 1.5px;
+      background-color: rgba(2, 131, 145, 0.2);
+      z-index: 1;
+    }
+
+    @media (max-width: 991px) {
+      .process-timeline {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+      }
+      .process-line {
+        display: none;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .process-timeline {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ----------------------------------------------------
+       13. CONTACT CTA
+       ---------------------------------------------------- */
+    #contact {
+      background-color: var(--navy-dark);
+      padding: 100px 0;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .contact-info {
+      position: relative;
+    }
+
+    .contact-card {
+      background: var(--navy-light);
+      border: 1px solid rgba(246, 220, 172, 0.1);
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--cream-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      background: rgba(1, 32, 78, 0.4);
+      border: 1px solid rgba(246, 220, 172, 0.15);
+      border-radius: 4px;
+      padding: 14px;
+      color: var(--cream);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      transition: var(--transition-smooth);
+      width: 100%;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+      background: rgba(1, 32, 78, 0.6);
+      box-shadow: 0 0 10px rgba(2, 131, 145, 0.15);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .error-msg {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--flame);
+      display: none;
+      margin-top: 4px;
+    }
+
+    /* Terminal logs response simulator */
+    .terminal-success {
+      display: none;
+      background: rgba(0, 19, 48, 0.9);
+      border: 1px solid var(--teal);
+      border-radius: 8px;
+      padding: 24px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: var(--cream);
+      margin-top: 24px;
+    }
+
+    .terminal-line {
+      margin-bottom: 6px;
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    .terminal-line.success-done {
+      color: var(--teal);
+    }
+
+    .terminal-line.success-accent {
+      color: var(--orange);
+    }
+
+    @keyframes terminal-fade {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 991px) {
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 50px;
+      }
+    }
+
+    /* ----------------------------------------------------
+       14. FOOTER
+       ---------------------------------------------------- */
+    footer {
+      background-color: var(--navy-dark);
+      border-top: 1px solid rgba(246, 220, 172, 0.05);
+      padding: 40px 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--cream-dark);
+      opacity: 0.8;
+    }
+
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-right {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-right a {
+      color: var(--cream-dark);
+      text-decoration: none;
+      transition: var(--transition-smooth);
+    }
+
+    .footer-right a:hover {
+      color: var(--teal);
+    }
+
+    /* ----------------------------------------------------
+       15. SCROLL-REVEAL SYSTEM
+       ---------------------------------------------------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                  transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ----------------------------------------------------
+       16. DATA INTAKE ENGINE
+       ---------------------------------------------------- */
+    #data-intake {
+      background-color: var(--navy-dark);
+      border-bottom: 1px solid rgba(246, 220, 172, 0.05);
+    }
+
+    .intake-card {
+      background: var(--navy-light);
+      border: 1px solid rgba(246, 220, 172, 0.1);
+      border-radius: 12px;
+      padding: 32px;
+      margin-top: 30px;
+    }
+
+    .upload-zone {
+      border: 2px dashed rgba(246, 220, 172, 0.25);
+      border-radius: 8px;
+      padding: 60px 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      background: rgba(1, 32, 78, 0.2);
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--teal);
+      background: rgba(2, 131, 145, 0.05);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: var(--teal);
+      margin-bottom: 16px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: rgba(246, 220, 172, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--teal) 0%, var(--flame) 100%);
+      transition: width 0.3s ease;
+    }
+
+    .status-text {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--cream-dark);
+      margin-top: 8px;
+    }
+
+    .issues-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .issue-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      align-items: start;
+    }
+
+    .issue-item.error {
+      background: rgba(248, 85, 37, 0.1);
+      border: 1px solid var(--flame);
+      color: #ffcccc;
+    }
+
+    .issue-item.warning {
+      background: rgba(250, 169, 104, 0.1);
+      border: 1px solid var(--orange);
+      color: #ffe6cc;
+    }
+
+    .issue-badge {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .issue-badge.error {
+      background: var(--flame);
+      color: white;
+    }
+
+    .issue-badge.warning {
+      background: var(--orange);
+      color: var(--navy-dark);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .filter-pane {
+      background: rgba(1, 32, 78, 0.3);
+      border: 1px solid rgba(246, 220, 172, 0.05);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .filter-pane h4 {
+      font-family: var(--font-display);
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+      color: var(--cream);
+      border-bottom: 1px solid rgba(246, 220, 172, 0.08);
+      padding-bottom: 8px;
+    }
+
+    .checkbox-pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-height: 150px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .checkbox-pill {
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 6px 12px;
+      border-radius: 100px;
+      background: rgba(246, 220, 172, 0.05);
+      border: 1px solid rgba(246, 220, 172, 0.15);
+      color: var(--cream-dark);
+      transition: var(--transition-smooth);
+      display: inline-block;
+      user-select: none;
+    }
+
+    .checkbox-pill input {
+      display: none;
+    }
+
+    .checkbox-pill.active {
+      background: var(--teal-alpha);
+      border-color: var(--teal);
+      color: var(--teal-light);
+    }
+
+    .preview-table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid rgba(246, 220, 172, 0.1);
+      border-radius: 6px;
+      margin-top: 16px;
+      background: rgba(1, 32, 78, 0.2);
+    }
+
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-align: left;
+    }
+
+    .preview-table th, .preview-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(246, 220, 172, 0.08);
+    }
+
+    .preview-table th {
+      background: rgba(1, 32, 78, 0.5);
+      color: var(--cream);
+      font-weight: 600;
+    }
+
+    .preview-table td {
+      color: var(--cream-dark);
+    }
+
+    .preview-table tr:hover td {
+      background: rgba(246, 220, 172, 0.02);
+    }
+
+    .stat-badge-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-badge {
+      background: rgba(1, 32, 78, 0.4);
+      border: 1px solid rgba(246, 220, 172, 0.08);
+      border-radius: 6px;
+      padding: 12px 18px;
+      flex: 1;
+    }
+
+    .stat-badge-label {
+      font-size: 0.7rem;
+      color: var(--cream-dark);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .stat-badge-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--teal-light);
+      font-family: var(--font-mono);
+    }
+
+    .stat-badge-value.orange-val {
+      color: var(--orange);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .conf-badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .conf-badge.high {
+      background: var(--teal-alpha);
+      color: var(--teal-light);
+      border: 1px solid var(--teal);
+    }
+
+    .conf-badge.low {
+      background: var(--orange-alpha);
+      color: var(--orange);
+      border: 1px solid var(--orange);
+    }
+
+    .conf-badge.failed {
+      background: var(--flame-alpha);
+      color: var(--flame);
+      border: 1px solid var(--flame);
+    }
+
+    .switch-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .switch-label {
+      font-size: 0.85rem;
+      color: var(--cream-dark);
+    }
+
+    /* Custom Switch style */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(246, 220, 172, 0.15);
+      transition: .3s;
+      border-radius: 34px;
+      border: 1px solid rgba(246, 220, 172, 0.1);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--cream);
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--teal);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+      background-color: var(--navy-dark);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="custom-cursor" id="custom-cursor" aria-hidden="true">
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+  </div>
+
+  <!-- Background Animated Blobs -->
+  <div class="blob-container" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Header -->
+  <header id="header">
+    <div class="container nav-container">
+      <a href="#" class="logo">OPTIPRICE<span>// DECISION ENGINE</span></a>
+      <button class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+      <ul class="nav-links">
+        <li><a href="#live-lab">[01 // SIMULATOR]</a></li>
+        <li><a href="#data-intake">[02 // DATA INTAKE]</a></li>
+        <li><a href="#projects">[03 // MODULES]</a></li>
+        <li><a href="#process">[04 // DEPLOYMENT]</a></li>
+        <li><a href="#contact">[05 // CONTACT]</a></li>
+        <li><a href="#contact" class="nav-cta">Book Demo</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <span class="eyebrow">Enterprise Price Optimization</span>
+        <h1 class="hero-title">
+          OptiPrice AI <span>Decision Engine</span>
+        </h1>
+        <p class="hero-subtitle">
+          Deploy predictive elasticity curves, model demand behaviors, and resolve profit-maximizing optimal pricing points automatically with our enterprise engine.
+        </p>
+        <div class="hero-actions">
+          <a href="#live-lab" class="btn btn-primary">Launch Simulator</a>
+          <a href="#projects" class="btn btn-secondary">Platform Modules</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-card">
+            <div class="stat-val">₹1.2 Cr<span>+</span></div>
+            <div class="stat-lbl">Annual ARR Saved</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">60%</div>
+            <div class="stat-lbl">Modeling Speedup</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">14.2%</div>
+            <div class="stat-lbl">Revenue Margin Uplift</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hero-asset">
+        <div class="console-frame">
+          <div class="console-header">
+            <div class="console-dots">
+              <div class="console-dot"></div>
+              <div class="console-dot"></div>
+              <div class="console-dot"></div>
+            </div>
+            <div class="console-title">analytics_engine.py</div>
+          </div>
+          <div class="console-body" id="console-output">
+            <!-- Simulated console code will be loaded sequentially via Javascript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Marquee Ticker -->
+  <div class="ticker-wrap" aria-hidden="true">
+    <div class="ticker">
+      <div class="ticker-item"><span>//</span>SQL</div>
+      <div class="ticker-item"><span>//</span>PYTHON</div>
+      <div class="ticker-item"><span>//</span>CAUSAL INFERENCE</div>
+      <div class="ticker-item"><span>//</span>EXPERIMENTATION</div>
+      <div class="ticker-item"><span>//</span>DBT</div>
+      <div class="ticker-item"><span>//</span>SNOWFLAKE</div>
+      <div class="ticker-item"><span>//</span>ECONOMETRICS</div>
+      <div class="ticker-item"><span>//</span>A/B TESTING</div>
+      <div class="ticker-item"><span>//</span>SURVIVAL ANALYSIS</div>
+      <div class="ticker-item"><span>//</span>DYNAMIC PRICING</div>
+      <!-- Repeat to cover width -->
+      <div class="ticker-item"><span>//</span>SQL</div>
+      <div class="ticker-item"><span>//</span>PYTHON</div>
+      <div class="ticker-item"><span>//</span>CAUSAL INFERENCE</div>
+      <div class="ticker-item"><span>//</span>EXPERIMENTATION</div>
+      <div class="ticker-item"><span>//</span>DBT</div>
+      <div class="ticker-item"><span>//</span>SNOWFLAKE</div>
+      <div class="ticker-item"><span>//</span>ECONOMETRICS</div>
+      <div class="ticker-item"><span>//</span>A/B TESTING</div>
+      <div class="ticker-item"><span>//</span>SURVIVAL ANALYSIS</div>
+      <div class="ticker-item"><span>//</span>DYNAMIC PRICING</div>
+    </div>
+  </div>
+
+  <!-- Section 1: Live Lab Pricing Elasticity Simulator -->
+  <section id="live-lab">
+    <div class="container reveal">
+      <span class="eyebrow">Interactive Sandbox</span>
+      <h2 class="section-title">01 // OptiPrice Simulator</h2>
+      <p class="section-desc">
+        A dynamic pricing simulation sandbox. Toggle base pricing benchmarks, marginal unit costs, market elasticity, competitor pricing, and demand curves to locate profit-maximizing optimums.
+      </p>
+      
+      <div class="lab-grid">
+        <!-- Interactive Control Panel -->
+        <div class="lab-controls">
+          <div class="control-header">
+            <h3>Simulator Parameters</h3>
+            <p>Slide controls or select segments to adjust the active economic scenario.</p>
+          </div>
+          
+          <!-- Market Segment Selector -->
+          <div class="toggle-group">
+            <span class="toggle-label">Target Market Segment</span>
+            <div class="segmented-control" id="toggle-segment">
+              <button class="segment-btn" data-segment="enterprise">Enterprise</button>
+              <button class="segment-btn active" data-segment="mass">Mass Market</button>
+              <button class="segment-btn" data-segment="discount">Discount</button>
+            </div>
+          </div>
+
+          <!-- Curve Model Selector -->
+          <div class="toggle-group">
+            <span class="toggle-label">Demand Elasticity Curve Type</span>
+            <div class="segmented-control" id="toggle-curve-model">
+              <button class="segment-btn active" data-model="linear">Linear Model</button>
+              <button class="segment-btn" data-model="constant">Constant Elasticity</button>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-info">
+              <span class="slider-label">Base Price (P₀)</span>
+              <span class="slider-value" id="val-base-price">₹500.00</span>
+            </div>
+            <input type="range" id="param-base-price" min="100" max="1000" value="500" step="10" aria-label="Base Price">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-info">
+              <span class="slider-label">Unit Cost (C)</span>
+              <span class="slider-value" id="val-unit-cost">₹200.00</span>
+            </div>
+            <input type="range" id="param-unit-cost" min="50" max="800" value="200" step="10" aria-label="Unit Cost">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-info">
+              <span class="slider-label">Price Elasticity (PED)</span>
+              <span class="slider-value" id="val-elasticity">-1.50</span>
+            </div>
+            <input type="range" id="param-elasticity" min="-3.0" max="-0.5" value="-1.5" step="0.1" aria-label="Price Elasticity of Demand">
+          </div>
+
+          <!-- Competitor Price Slider -->
+          <div class="slider-group">
+            <div class="slider-info">
+              <span class="slider-label">Competitor Benchmark Price (P_c)</span>
+              <span class="slider-value" id="val-competitor-price">₹550.00</span>
+            </div>
+            <input type="range" id="param-competitor-price" min="100" max="1000" value="550" step="10" aria-label="Competitor Price">
+          </div>
+
+          <div class="slider-group active-slider">
+            <div class="slider-info">
+              <span class="slider-label" style="font-weight: 600;">Price Adjustment (ΔP %)</span>
+              <span class="slider-value flame-color" id="val-price-change" style="font-size: 1rem;">+0%</span>
+            </div>
+            <input type="range" id="param-price-change" min="-50" max="100" value="0" step="1" aria-label="Active Price Change Percentage">
+          </div>
+
+          <div class="lab-metrics">
+            <div class="metric-box">
+              <div class="metric-title">Current Price</div>
+              <div class="metric-value" id="metric-price">₹500.00</div>
+              <div class="metric-delta" id="delta-price">--</div>
+            </div>
+            
+            <div class="metric-box">
+              <div class="metric-title">Demand (Units)</div>
+              <div class="metric-value" id="metric-demand">10,000</div>
+              <div class="metric-delta" id="delta-demand">--</div>
+            </div>
+
+            <div class="metric-box">
+              <div class="metric-title">Revenue (Est.)</div>
+              <div class="metric-value" id="metric-revenue">₹50,00,000</div>
+              <div class="metric-delta" id="delta-revenue">--</div>
+            </div>
+
+            <div class="metric-box">
+              <div class="metric-title">Gross Profit</div>
+              <div class="metric-value" id="metric-profit">₹30,00,000</div>
+              <div class="metric-delta" id="delta-profit">--</div>
+            </div>
+          </div>
+
+          <div class="optimization-card">
+            <div class="opt-header">
+              <span>Optimization Solution</span>
+              <span style="font-size: 0.65rem; background: var(--teal-alpha); padding: 2px 6px; border-radius: 4px;">Analytical Optimum</span>
+            </div>
+            <div class="opt-grid">
+              <div>
+                <div style="font-size: 0.7rem; color: var(--cream-dark); opacity: 0.8; margin-bottom: 2px;">Optimal Price (P*)</div>
+                <div class="opt-value" id="opt-price">₹516.67</div>
+              </div>
+              <div>
+                <div style="font-size: 0.7rem; color: var(--cream-dark); opacity: 0.8; margin-bottom: 2px;">Max Gross Profit</div>
+                <div class="opt-value" id="opt-profit">₹30,08,654</div>
+              </div>
+            </div>
+            <div class="opt-desc" id="opt-explanation">
+              <strong>Midpoint Theorem:</strong> Under a linear model, the optimal price is exactly halfway between the unit cost (C) and the reservation price (P<sub>max</sub> = P₀ × (1 - 1/PED)).
+            </div>
+          </div>
+
+          <button class="reset-btn" id="reset-lab-btn">Reset Simulator</button>
+        </div>
+
+        <!-- Canvas Visualizer -->
+        <div class="lab-visualizer">
+          <div class="visualizer-header">
+            <h3>Visual Model</h3>
+            <div class="segmented-control" id="toggle-visualization">
+              <button class="segment-btn active" id="btn-show-curves">Elasticity Curve</button>
+              <button class="segment-btn" id="btn-show-heatmap">Margin Heatmap</button>
+              <button class="segment-btn" id="btn-show-3d">3D Profit Surface</button>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <canvas id="elasticity-chart"></canvas>
+          </div>
+          
+          <!-- Legend Items -->
+          <div class="chart-legend" id="legend-normal-view">
+            <div class="legend-item">
+              <div class="legend-line line-demand"></div>
+              <span>Demand (Q)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-line line-profit"></div>
+              <span>Profit (₹)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-line line-current"></div>
+              <span>Current Price</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-line line-optimal"></div>
+              <span>Optimal Price (P*)</span>
+            </div>
+          </div>
+          
+          <div class="chart-legend" id="legend-heatmap-view" style="display: none;">
+            <div class="legend-item">
+              <div style="width: 16px; height: 12px; background: linear-gradient(to right, #01204E, #028391, #FAA968); border-radius: 2px;"></div>
+              <span>Profit Scale (Low &rarr; High)</span>
+            </div>
+            <div class="legend-item">
+              <div style="width: 16px; height: 2px; border-top: 1.5px dashed var(--cream); margin: 0 4px;"></div>
+              <span>Optimal Price Frontier</span>
+            </div>
+          </div>
+
+          <div class="chart-legend" id="legend-3d-view" style="display: none;">
+            <div class="legend-item">
+              <div style="width: 12px; height: 12px; border: 1.5px solid #028391; border-radius: 2px;"></div>
+              <span>3D Surface Grid Mesh</span>
+            </div>
+            <div class="legend-item">
+              <div style="width: 8px; height: 8px; background-color: #F85525; border-radius: 50%;"></div>
+              <span>Current Scenario (Price/Cost)</span>
+            </div>
+            <div class="legend-item">
+              <span style="font-size: 0.7rem; color: var(--cream-dark); opacity: 0.8; font-style: italic;">* Drag canvas to rotate 3D view</span>
+            </div>
+          </div>
+
+          <!-- Seasonal 12-Month Projection -->
+          <div class="timeline-container" style="margin-top: 12px; padding-top: 16px; border-top: 1px dashed rgba(246, 220, 172, 0.12);">
+            <h4 style="font-family: var(--font-sans); font-size: 0.8rem; color: var(--cream); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Seasonal Profit Timeline (12-Month Projection)</h4>
+            <canvas id="timeline-chart" height="90" style="width: 100%; height: 90px;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Developer API Playground Card -->
+      <div class="api-playground">
+        <div class="api-playground-header">
+          <h3>01.1 // Developer API Playground</h3>
+          <p>Inspect real-time API request payloads and JSON optimization responses synced directly to the simulator state.</p>
+        </div>
+        
+        <div class="api-grid">
+          <div class="api-panel">
+            <h4>API Request</h4>
+            <div class="api-request-info">
+              <span class="api-method">GET</span>
+              <span class="api-url" id="api-request-url">https://api.optiprice.ai/v1/optimize?base_price=500&amp;cost=200&amp;elasticity=-1.50</span>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--cream-dark); opacity: 0.8; line-height: 1.5;">
+              Integrate this API endpoint inside your billing pipelines or checkout pages to calculate real-time elastic demand scales dynamically.
+            </div>
+          </div>
+          
+          <div class="api-panel" style="position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h4 style="margin: 0;">JSON Response</h4>
+              <button class="segment-btn" id="btn-copy-json" style="padding: 3px 10px; font-size: 0.65rem; border-radius: 4px; text-transform: uppercase; border: 1px solid rgba(246, 220, 172, 0.2);">Copy Schema</button>
+            </div>
+            <pre class="code-block" id="api-response-json">{ ... }</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Data Intake & Elasticity Engine -->
+  <section id="data-intake">
+    <div class="container reveal">
+      <span class="eyebrow">Enterprise Data Intake</span>
+      <h2 class="section-title">02 // Data Intake & Elasticity Engine</h2>
+      <p class="section-desc">
+        Upload transaction datasets (CSVs up to 50MB) to perform automated column mapping, data validation, and multi-variable elasticity regressions.
+      </p>
+
+      <div class="intake-card" id="intake-card-content">
+        <!-- Cold Start Wake-up Banner -->
+        <div id="engine-wakeup-banner" style="display: none; background: rgba(250, 169, 104, 0.1); border: 1px solid var(--orange); border-radius: 8px; padding: 15px; margin-bottom: 24px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--orange); align-items: center; gap: 12px;">
+          <div style="width: 8px; height: 8px; background: var(--orange); border-radius: 50%; opacity: 0.8;"></div>
+          <div>
+            <strong>Waking up the pricing engine...</strong> This free-tier service cold-starts after inactivity. Operations will resume in about 30-60 seconds.
+          </div>
+        </div>
+
+        <!-- STEP 1: UPLOAD ZONE -->
+        <div id="intake-step-upload">
+          <div class="upload-zone" id="upload-dropzone">
+            <div class="upload-icon">&#x21ea;</div>
+            <h3 style="font-family: var(--font-display); color: var(--cream); margin-bottom: 8px;">Drag & Drop CSV File Here</h3>
+            <p style="font-size: 0.85rem; color: var(--cream-dark); margin-bottom: 20px;">Or click to select a file from your device (up to 50MB / ~500k rows)</p>
+            <input type="file" id="intake-file-input" accept=".csv" style="display: none;">
+            <button class="btn btn-primary" id="btn-browse-file" style="padding: 10px 20px; font-size: 0.85rem;">Browse Files</button>
+          </div>
+          
+          <div class="progress-bar-container" id="upload-progress-container">
+            <div class="progress-bar-fill" id="upload-progress-bar"></div>
+          </div>
+          <div class="status-text" id="upload-status-text" style="display: none;">Uploading dataset...</div>
+
+          <div style="margin-top: 24px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--cream-dark); opacity: 0.8; line-height: 1.6;">
+            <strong>Expected Schema:</strong><br>
+            - Required: <code>sku</code>, <code>date</code>, <code>price</code>, <code>units_sold</code><br>
+            - Optional: <code>competitor_price</code>, <code>promo</code>, <code>unit_cost</code>, <code>category</code><br>
+            - Matches aliases: <em>product_id, qty, quantity, cost, cogs, week, sales...</em>
+          </div>
+
+          <div style="margin-top: 16px; padding: 10px; border-radius: 4px; background: rgba(248, 85, 37, 0.05); border: 1px solid rgba(248, 85, 37, 0.2); font-family: var(--font-mono); font-size: 0.72rem; color: var(--orange);">
+            <strong>Neon Database Storage Warning:</strong> Free tier is capped at 0.5GB (~500k rows max). To prevent ceiling exhaustion, avoid uploading duplicate/redundant datasets.
+          </div>
+        </div>
+
+        <!-- STEP 2: VALIDATION REPORT -->
+        <div id="intake-step-validation" style="display: none;">
+          <h3 style="font-family: var(--font-display); color: var(--cream); margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+            Dataset Validation Findings
+            <span class="conf-badge" id="val-status-badge">Validating...</span>
+          </h3>
+          
+          <div class="stat-badge-row">
+            <div class="stat-badge">
+              <div class="stat-badge-label">Parsed Rows</div>
+              <div class="stat-badge-value" id="val-stat-rows">0</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-badge-label">Unique SKUs</div>
+              <div class="stat-badge-value" id="val-stat-skus">0</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-badge-label">Missing Optional Fields</div>
+              <div class="stat-badge-value orange-val" id="val-stat-missing-cols">None</div>
+            </div>
+          </div>
+
+          <div class="issues-list" id="validation-issues-list">
+            <!-- Validation issues rendered here -->
+          </div>
+
+          <!-- Blocking Inquiry form (displayed only if blocking errors found) -->
+          <div id="blocking-inquiry-box" style="display: none; margin-top: 24px; padding-top: 20px; border-top: 1px dashed rgba(246, 220, 172, 0.1);">
+            <h4 style="font-family: var(--font-display); color: var(--flame); margin-bottom: 10px;">File a Technical Data Inquiry</h4>
+            <p style="font-size: 0.82rem; color: var(--cream-dark); margin-bottom: 16px;">
+              Our automated system detected schema errors in your dataset. Fill out this support request to have an analyst manually verify and map your file.
+            </p>
+            <form id="support-inquiry-form">
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label" style="font-size: 0.75rem;">Subject</label>
+                <input type="text" id="support-subject" class="form-input" style="padding: 10px; font-size: 0.85rem;" readonly>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label" style="font-size: 0.75rem;">Message / Inquiry Details</label>
+                <textarea id="support-message" class="form-textarea" style="min-height: 80px; padding: 10px; font-size: 0.85rem;" placeholder="Explain any non-standard date formats, SKU structures or source queries..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.85rem; background: var(--flame);">File Support Inquiry</button>
+            </form>
+            <div class="terminal-success" id="support-success-box" style="margin-top: 16px;">
+              <!-- success logs -->
+            </div>
+          </div>
+
+          <div style="margin-top: 28px; display: flex; gap: 16px;">
+            <button class="btn btn-secondary" id="btn-val-back-upload" style="margin-left: 0;">Upload Different File</button>
+            <button class="btn btn-primary" id="btn-val-proceed-filter" style="display: none;">Proceed to Filtering</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: FILTER & PREVIEW -->
+        <div id="intake-step-filter" style="display: none;">
+          <h3 style="font-family: var(--font-display); color: var(--cream); margin-bottom: 8px;">Apply Dataset Filters</h3>
+          <p style="font-size: 0.85rem; color: var(--cream-dark); margin-bottom: 24px;">Refine your transaction observations before running regression models.</p>
+
+          <div class="filter-grid">
+            <!-- Left Pane: Controls -->
+            <div class="filter-pane">
+              <h4 style="font-family: var(--font-display);">Exclude Filters</h4>
+              
+              <div class="switch-toggle">
+                <span class="switch-label">Exclude SKUs with insufficient history (&lt;10 obs)</span>
+                <label class="switch">
+                  <input type="checkbox" id="filter-exclude-insufficient" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="switch-toggle" style="margin-bottom: 20px;">
+                <span class="switch-label">Exclude rows with missing optional columns</span>
+                <label class="switch">
+                  <input type="checkbox" id="filter-exclude-missing-optional">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label" style="font-size: 0.72rem;">Start Date</label>
+                <input type="date" id="filter-start-date" class="form-input" style="padding: 8px; font-size: 0.8rem;">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.72rem;">End Date</label>
+                <input type="date" id="filter-end-date" class="form-input" style="padding: 8px; font-size: 0.8rem;">
+              </div>
+            </div>
+
+            <!-- Right Pane: Category Select -->
+            <div class="filter-pane">
+              <h4 style="font-family: var(--font-display);">Categories to Include</h4>
+              <div class="checkbox-pill-grid" id="filter-categories-grid">
+                <!-- Categories rendered here -->
+              </div>
+              <p style="font-size: 0.72rem; color: var(--cream-dark); margin-top: 10px; opacity: 0.7;">
+                Select category filters to restrict regressions to specific product groups.
+              </p>
+            </div>
+          </div>
+
+          <h4 style="font-family: var(--font-display); color: var(--cream); margin-top: 24px; margin-bottom: 12px;">Duplicate Row Resolution</h4>
+          <div class="duplicate-resolution-box" style="background: rgba(246, 220, 172, 0.03); border: 1px solid rgba(246, 220, 172, 0.1); border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+            <p style="font-size: 0.8rem; color: var(--cream-dark); margin-bottom: 12px;">
+              Select how to resolve duplicate transactions containing the same SKU and Date:
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <label style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--cream); cursor: pointer;">
+                <input type="radio" name="duplicate-handling" value="average_sum" checked style="accent-color: var(--teal);">
+                <span>Option A: Average price &amp; sum units_sold (Default) <span style="opacity: 0.6;" id="dup-count-a">(Affects 0 rows)</span></span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--cream); cursor: pointer;">
+                <input type="radio" name="duplicate-handling" value="keep_first" style="accent-color: var(--teal);">
+                <span>Option B: Keep only the first occurrence <span style="opacity: 0.6;" id="dup-count-b">(Affects 0 rows)</span></span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--cream); cursor: pointer;">
+                <input type="radio" name="duplicate-handling" value="keep_last" style="accent-color: var(--teal);">
+                <span>Option C: Keep only the last occurrence <span style="opacity: 0.6;" id="dup-count-c">(Affects 0 rows)</span></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="stat-badge-row" style="margin-bottom: 24px;">
+            <div class="stat-badge">
+              <div class="stat-badge-label">Active Filter Scope</div>
+              <div class="stat-badge-value" id="filter-stat-summary">Calculating...</div>
+            </div>
+          </div>
+
+          <h4 style="font-family: var(--font-display); color: var(--cream); margin-bottom: 8px;">Parsed Observations Preview</h4>
+          <div class="preview-table-container">
+            <table class="preview-table">
+              <thead>
+                <tr id="preview-table-headers">
+                  <th>SKU</th>
+                  <th>Date</th>
+                  <th>Price</th>
+                  <th>Units Sold</th>
+                  <th>Comp Price</th>
+                  <th>Promo</th>
+                  <th>Unit Cost</th>
+                  <th>Category</th>
+                </tr>
+              </thead>
+              <tbody id="preview-table-body">
+                <!-- Sample rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top: 28px; display: flex; gap: 16px;">
+            <button class="btn btn-secondary" id="btn-filter-back-validation" style="margin-left: 0;">Back to Validation</button>
+            <button class="btn btn-primary" id="btn-filter-run-analysis">Run Regression Analysis</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: REGRESSION PROGRESS -->
+        <div id="intake-step-progress" style="display: none; text-align: center; padding: 40px 0;">
+          <div class="upload-icon" style="animation: spin 3s linear infinite;">&#x21bb;</div>
+          <h3 style="font-family: var(--font-display); color: var(--cream); margin-bottom: 8px;">Estimating Elasticity Regressions</h3>
+          <p style="font-size: 0.85rem; color: var(--cream-dark); margin-bottom: 20px;">Processing SKU observations via Statsmodels OLS background worker...</p>
+          
+          <div class="progress-bar-container" style="display: block; max-width: 500px; margin: 0 auto;">
+            <div class="progress-bar-fill" id="analysis-progress-bar"></div>
+          </div>
+          <div class="status-text" id="analysis-status-text">Analyzing SKUs: 0%</div>
+        </div>
+
+        <!-- STEP 5: RESULTS VIEW -->
+        <div id="intake-step-results" style="display: none;">
+          <h3 style="font-family: var(--font-display); color: var(--cream); margin-bottom: 8px;">Elasticity Regression Results</h3>
+          <p style="font-size: 0.85rem; color: var(--cream-dark); margin-bottom: 24px;">Multi-variable log-log elasticity analysis complete.</p>
+
+          <div class="stat-badge-row">
+            <div class="stat-badge">
+              <div class="stat-badge-label">Avg Elasticity (PED)</div>
+              <div class="stat-badge-value" id="results-stat-avg-ped">-1.50</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-badge-label">SKUs Analyzed</div>
+              <div class="stat-badge-value" id="results-stat-skus">0 / 0</div>
+            </div>
+            <div class="stat-badge">
+              <div class="stat-badge-label">Observations Used</div>
+              <div class="stat-badge-value" id="results-stat-rows">0</div>
+            </div>
+          </div>
+
+          <div class="preview-table-container" style="max-height: 400px; overflow-y: auto;">
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>Elasticity Coefficient</th>
+                  <th>Std Error</th>
+                  <th>p-value</th>
+                  <th>R²</th>
+                  <th>Confidence Flag</th>
+                  <th>Details / Errors</th>
+                </tr>
+              </thead>
+              <tbody id="results-table-body">
+                <!-- Results -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top: 28px; display: flex; gap: 16px;">
+            <button class="btn btn-secondary" id="btn-results-back-filter" style="margin-left: 0;">Re-Filter Dataset</button>
+            <button class="btn btn-primary" id="btn-results-new-upload">Upload New Dataset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: OptiPrice Platform Modules -->
+  <section id="projects">
+    <div class="container reveal">
+      <span class="eyebrow">Core Architecture</span>
+      <h2 class="section-title">03 // Platform Modules</h2>
+      <p class="section-desc">
+        Enterprise-grade intelligence modules configured to run natively on your cloud transaction databases for automated margin recovery.
+      </p>
+      
+      <div class="projects-grid">
+        <!-- Project 1 -->
+        <div class="project-card">
+          <div>
+            <span class="project-tag">Retention Intelligence</span>
+            <h3 class="project-title">LTV & Churn Modeling Engine</h3>
+            <p class="project-desc">
+              Calculates cohort-based survival curves on transaction ledgers to isolate churn triggers, unlocking targeted retention campaigns saving ₹1.2 Crore+ in annual ARR.
+            </p>
+            <div class="project-graphics" aria-hidden="true">
+              <svg class="project-chart" viewBox="0 0 200 100">
+                <path d="M 15 10 L 15 85 L 185 85" stroke="rgba(246, 220, 172, 0.2)" stroke-width="1.5" fill="none" />
+                <path d="M 15 20 Q 60 20, 90 55 T 185 80" stroke="var(--teal)" stroke-width="2.5" fill="none" />
+                <line x1="90" y1="55" x2="90" y2="85" stroke="var(--orange)" stroke-width="1" stroke-dasharray="3,3" />
+                <circle cx="90" cy="55" r="4" fill="var(--orange)" />
+                <text x="98" y="52" fill="var(--orange)" font-family="var(--font-mono)" font-size="8">Inflection Pt</text>
+                <text x="15" y="95" fill="var(--cream-dark)" font-family="var(--font-mono)" font-size="7" opacity="0.6">0m</text>
+                <text x="175" y="95" fill="var(--cream-dark)" font-family="var(--font-mono)" font-size="7" opacity="0.6">12m</text>
+              </svg>
+            </div>
+          </div>
+          <div class="project-tech">
+            <span class="tech-badge">Python</span>
+            <span class="tech-badge">Survival Analysis</span>
+            <span class="tech-badge">SQL</span>
+            <span class="tech-badge">Cohorts</span>
+          </div>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="project-card">
+          <div>
+            <span class="project-tag">Experimentation</span>
+            <h3 class="project-title">Causal A/B Test Engine</h3>
+            <p class="project-desc">
+              Automates sample sizing, statistical power checks, p-value calculations, and Bayesian conversions to validate elasticity changes in pilots.
+            </p>
+            <div class="project-graphics" aria-hidden="true">
+              <svg class="project-chart" viewBox="0 0 200 100">
+                <path d="M 15 85 L 185 85" stroke="rgba(246, 220, 172, 0.2)" stroke-width="1.5" fill="none" />
+                <!-- Curve A -->
+                <path d="M 20 85 Q 65 85, 80 30 T 140 85" stroke="var(--teal)" stroke-width="1.5" fill="none" opacity="0.5" />
+                <!-- Curve B -->
+                <path d="M 60 85 Q 105 85, 120 20 T 180 85" stroke="var(--flame)" stroke-width="2" fill="none" />
+                <!-- Alpha Threshold -->
+                <line x1="108" y1="15" x2="108" y2="85" stroke="var(--orange)" stroke-width="1.5" stroke-dasharray="2,2" />
+                <text x="114" y="40" fill="var(--orange)" font-family="var(--font-mono)" font-size="8">p = 0.042</text>
+              </svg>
+            </div>
+          </div>
+          <div class="project-tech">
+            <span class="tech-badge">Statsmodels</span>
+            <span class="tech-badge">Bootstrapping</span>
+            <span class="tech-badge">Bayesian A/B</span>
+          </div>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="project-card">
+          <div>
+            <span class="project-tag">Data Integration</span>
+            <h3 class="project-title">Cloud ETL & Lineage Warehouse</h3>
+            <p class="project-desc">
+              Natively connects to Snowflake, BigQuery, or Redshift via automated dbt pipelines, aggregating raw transactions into clean datasets for optimization.
+            </p>
+            <div class="project-graphics" aria-hidden="true">
+              <svg class="project-chart" viewBox="0 0 200 100">
+                <!-- Lines -->
+                <path d="M 25 50 L 80 25 M 25 50 L 80 75 M 80 25 L 140 50 M 80 75 L 140 50 M 140 50 L 175 50" stroke="rgba(2, 131, 145, 0.5)" stroke-width="1.5" fill="none" />
+                <!-- Source Node -->
+                <circle cx="25" cy="50" r="5" fill="var(--orange)" />
+                <text x="15" y="40" fill="var(--cream)" font-family="var(--font-mono)" font-size="7">Raw DB</text>
+                <!-- Staging Nodes -->
+                <circle cx="80" cy="25" r="5" fill="var(--teal)" />
+                <text x="70" y="16" fill="var(--cream)" font-family="var(--font-mono)" font-size="7">stg_orders</text>
+                <circle cx="80" cy="75" r="5" fill="var(--teal)" />
+                <text x="70" y="90" fill="var(--cream)" font-family="var(--font-mono)" font-size="7">stg_users</text>
+                <!-- Fct Node -->
+                <circle cx="140" cy="50" r="5" fill="var(--teal)" />
+                <text x="125" y="40" fill="var(--cream)" font-family="var(--font-mono)" font-size="7">fct_sales</text>
+                <!-- Target Node -->
+                <polygon points="175,46 185,50 175,54" fill="var(--flame)" />
+                <text x="165" y="65" fill="var(--cream)" font-family="var(--font-mono)" font-size="7">BI BI</text>
+              </svg>
+            </div>
+          </div>
+          <div class="project-tech">
+            <span class="tech-badge">dbt</span>
+            <span class="tech-badge">Snowflake</span>
+            <span class="tech-badge">SQL</span>
+            <span class="tech-badge">Looker</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Integration Flow (Light theme contrast) -->
+  <section id="process">
+    <div class="container reveal">
+      <span class="eyebrow" style="color: var(--teal);">Seamless Integration</span>
+      <h2 class="section-title">04 // Integration Flow</h2>
+      <p class="section-desc">
+        Four rapid stages to connect your data source, model market behavior, and push automated price adjustments.
+      </p>
+      
+      <div class="integration-grid">
+        <!-- Left: Process Timeline Steps -->
+        <div class="process-timeline-vertical">
+          <!-- Step 1 -->
+          <div class="process-step-vertical">
+            <div class="step-num-vertical">01</div>
+            <div class="step-content-vertical">
+              <h3 class="step-title">Connect Warehouses</h3>
+              <p class="step-desc">
+                Integrate Snowflake, BigQuery, or Postgres transaction logs via secure, read-only cloud data pipelines.
+              </p>
+            </div>
+          </div>
+          <!-- Step 2 -->
+          <div class="process-step-vertical">
+            <div class="step-num-vertical">02</div>
+            <div class="step-content-vertical">
+              <h3 class="step-title">Causal AI Fitting</h3>
+              <p class="step-desc">
+                Automatically fit structural price-elasticity models over seasonal ledger trends and transaction frequencies.
+              </p>
+            </div>
+          </div>
+          <!-- Step 3 -->
+          <div class="process-step-vertical">
+            <div class="step-num-vertical">03</div>
+            <div class="step-content-vertical">
+              <h3 class="step-title">Simulate & Plan</h3>
+              <p class="step-desc">
+                Leverage our dynamic sandbox dashboard to run simulations, evaluate margin deltas, and pinpoint midpoint optimums.
+              </p>
+            </div>
+          </div>
+          <!-- Step 4 -->
+          <div class="process-step-vertical">
+            <div class="step-num-vertical">04</div>
+            <div class="step-content-vertical">
+              <h3 class="step-title">Push Optimizations</h3>
+              <p class="step-desc">
+                Stream optimal prices directly back to your e-commerce platform or billing systems via standard API pipelines.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Interactive Schema Mapper -->
+        <div class="schema-mapper-container">
+          <div class="schema-mapper-card">
+            <h4>Live Schema Mapper</h4>
+            <p style="font-size: 0.75rem; color: var(--navy-light); margin-bottom: 16px; line-height: 1.4;">
+              Map your database source columns to the standard OptiPrice API structure. Click a row to test different schema models.
+            </p>
+            
+            <div class="schema-mapping-row active" data-field="price">
+              <span class="schema-source">shopify_orders.price_usd</span>
+              <span class="schema-arrow">&rarr;</span>
+              <span class="schema-target">price_base</span>
+            </div>
+            
+            <div class="schema-mapping-row" data-field="cost">
+              <span class="schema-source">inventory.cost_of_goods</span>
+              <span class="schema-arrow">&rarr;</span>
+              <span class="schema-target">price_cost</span>
+            </div>
+
+            <div class="schema-mapping-row" data-field="qty">
+              <span class="schema-source">order_items.quantity</span>
+              <span class="schema-arrow">&rarr;</span>
+              <span class="schema-target">demand_q</span>
+            </div>
+
+            <div class="schema-mapping-row" data-field="comp">
+              <span class="schema-source">competitor_scrapers.lowest_price</span>
+              <span class="schema-arrow">&rarr;</span>
+              <span class="schema-target">competitor_price</span>
+            </div>
+
+            <div class="schema-mapper-preview">
+              <div class="mapper-preview-header" id="mapper-preview-title">API Field: price_base</div>
+              <pre id="mapper-preview-code">{"source": "shopify_orders.price_usd", "type": "FLOAT", "description": "Benchmark listing price from store catalog.", "mapped_value": 500}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Enterprise Consultation CTA -->
+  <section id="contact">
+    <div class="container reveal">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <span class="eyebrow">Schedule a Consultation</span>
+          <h2 class="section-title">Optimize Your Pricing Dynamics Today</h2>
+          <p class="section-desc" style="margin-bottom: 24px;">
+            Get a custom pricing evaluation report. Discover how OptiPrice AI can identify margin leakages and boost gross profit.
+          </p>
+          <div style="font-family: var(--font-mono); font-size: 0.9rem; display: flex; flex-direction: column; gap: 12px;">
+            <div>Email: <a href="mailto:sales@optiprice.ai" style="color: var(--teal); text-decoration: none;">sales@optiprice.ai</a></div>
+            <div>GitHub: <a href="#" style="color: var(--teal); text-decoration: none;">github.com/optiprice-ai</a></div>
+            <div>LinkedIn: <a href="#" style="color: var(--teal); text-decoration: none;">linkedin.com/company/optiprice-ai</a></div>
+          </div>
+        </div>
+        
+        <div class="contact-card">
+          <form id="contact-form" novalidate>
+            <div class="form-group">
+              <label for="form-name" class="form-label">Full Name</label>
+              <input type="text" id="form-name" class="form-input" placeholder="Your Name / Title" required>
+              <span class="error-msg" id="err-name">Please provide your name</span>
+            </div>
+            
+            <div class="form-group">
+              <label for="form-email" class="form-label">Email Address</label>
+              <input type="email" id="form-email" class="form-input" placeholder="you@company.com" required>
+              <span class="error-msg" id="err-email">Please provide a valid email address</span>
+            </div>
+            
+            <div class="form-group">
+              <label for="form-challenge" class="form-label">Analytical Challenge</label>
+              <select id="form-challenge" class="form-select">
+                <option value="pricing">OptiPrice Enterprise Suite Demo</option>
+                <option value="experimentation">A/B Experimentation Setup</option>
+                <option value="pipelines">Database / Snowflake Integration</option>
+                <option value="other">General Consultation / Other Inquiry</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="form-msg" class="form-label">Project Scope / Annual Revenue</label>
+              <textarea id="form-msg" class="form-textarea" placeholder="Describe your current billing volume, price catalog size, and key pricing goals..." required></textarea>
+              <span class="error-msg" id="err-msg">Please outline your project scope</span>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Request Consultation</button>
+          </form>
+
+          <!-- Terminal response loader -->
+          <div class="terminal-success" id="success-terminal" aria-live="polite">
+            <!-- Simulated logs will appear here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-container">
+      <div class="footer-left">
+        &copy; 2026 OptiPrice AI. Handcoded with &lt;canvas&gt; &amp; Vanilla JS.
+      </div>
+      <div class="footer-right">
+        <a href="#live-lab">Simulator</a>
+        <a href="#projects">Modules</a>
+        <a href="#process">Workflow</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript Code -->
+  <script>
+    /* ----------------------------------------------------
+       1. CUSTOM CURSOR MOTION
+       ---------------------------------------------------- */
+    const cursor = document.getElementById('custom-cursor');
+    const dot = cursor.querySelector('.cursor-dot');
+    const ring = cursor.querySelector('.cursor-ring');
+    
+    let mouseX = -100, mouseY = -100;
+    let ringX = -100, ringY = -100;
+    
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      
+      dot.style.left = `${mouseX}px`;
+      dot.style.top = `${mouseY}px`;
+    });
+    
+    function animateRing() {
+      // Interpolate for smooth trailing delay
+      ringX += (mouseX - ringX) * 0.18;
+      ringY += (mouseY - ringY) * 0.18;
+      
+      ring.style.left = `${ringX}px`;
+      ring.style.top = `${ringY}px`;
+      
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+    
+    // Bind hovering state classes
+    function refreshHoverElements() {
+      const hoverElements = document.querySelectorAll('a, button, input[type="range"], select, textarea, input[type="text"], input[type="email"], .project-card, .slider-group');
+      hoverElements.forEach(elem => {
+        // Prevent double bindings
+        elem.removeEventListener('mouseenter', onMouseEnter);
+        elem.removeEventListener('mouseleave', onMouseLeave);
+        
+        elem.addEventListener('mouseenter', onMouseEnter);
+        elem.addEventListener('mouseleave', onMouseLeave);
+      });
+    }
+    
+    function onMouseEnter() { cursor.classList.add('hovering'); }
+    function onMouseLeave() { cursor.classList.remove('hovering'); }
+    
+    refreshHoverElements();
+
+    /* ----------------------------------------------------
+       2. SCROLL HEADER & REVEALS
+       ---------------------------------------------------- */
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    const revealElements = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    revealElements.forEach(el => observer.observe(el));
+
+    /* ----------------------------------------------------
+       3. SIMULATED HERO PYTHON CONSOLE
+       ---------------------------------------------------- */
+    const consoleOutput = document.getElementById('console-output');
+    const codeLines = [
+      { text: ">>> import optiprice as op", delay: 100 },
+      { text: ">>> import pandas as pd", delay: 200 },
+      { text: ">>> ", delay: 100 },
+      { text: ">>> # Ingesting transaction database...", delay: 200, class: "warn" },
+      { text: ">>> df = op.load_ledger('enterprise_sales.parquet')", delay: 300 },
+      { text: ">>> print(f'Loaded {len(df):,} transactions')", delay: 200 },
+      { text: "Loaded 1,420,865 transactions", delay: 100, class: "success" },
+      { text: ">>> ", delay: 100 },
+      { text: ">>> # Fitting causal demand sensitivity model...", delay: 200, class: "warn" },
+      { text: ">>> model = op.CausalDemandModel(elasticity=-1.50)", delay: 350 },
+      { text: ">>> opt_p = model.find_optimal_price(cost=200.00)", delay: 300 },
+      { text: ">>> print(f'Optimal price: ₹{opt_p:.2f}')", delay: 200 },
+      { text: "Optimal price: ₹516.67", delay: 100, class: "accent" },
+      { text: ">>> model.plot_curves()", delay: 400 },
+      { text: "[SUCCESS] OptiPrice simulation ready on port 8000.", delay: 100, class: "success" }
+    ];
+
+    let lineIndex = 0;
+    function printNextLine() {
+      if (lineIndex < codeLines.length) {
+        const line = codeLines[lineIndex];
+        const div = document.createElement('div');
+        div.className = `console-line ${line.class || ''}`;
+        div.textContent = line.text;
+        consoleOutput.appendChild(div);
+        
+        // Scroll console body to bottom
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        
+        lineIndex++;
+        setTimeout(printNextLine, line.delay);
+      }
+    }
+    setTimeout(printNextLine, 800);
+
+    /* ----------------------------------------------------
+       4. ELASTICITY SIMULATOR MODEL LOGIC (CANVAS)
+       ---------------------------------------------------- */
+    // DOM Elements
+    const pBaseInput = document.getElementById('param-base-price');
+    const pCostInput = document.getElementById('param-unit-cost');
+    const pElasticityInput = document.getElementById('param-elasticity');
+    const pCompInput = document.getElementById('param-competitor-price');
+    const pChangeInput = document.getElementById('param-price-change');
+
+    const vBasePrice = document.getElementById('val-base-price');
+    const vUnitCost = document.getElementById('val-unit-cost');
+    const vElasticity = document.getElementById('val-elasticity');
+    const vCompPrice = document.getElementById('val-competitor-price');
+    const vPriceChange = document.getElementById('val-price-change');
+
+    const mPrice = document.getElementById('metric-price');
+    const mDemand = document.getElementById('metric-demand');
+    const mRevenue = document.getElementById('metric-revenue');
+    const mProfit = document.getElementById('metric-profit');
+
+    const dPrice = document.getElementById('delta-price');
+    const dDemand = document.getElementById('delta-demand');
+    const dRevenue = document.getElementById('delta-revenue');
+    const dProfit = document.getElementById('delta-profit');
+
+    const oPrice = document.getElementById('opt-price');
+    const oProfit = document.getElementById('opt-profit');
+    const optExp = document.getElementById('opt-explanation');
+
+    const canvas = document.getElementById('elasticity-chart');
+    const ctx = canvas.getContext('2d');
+
+    const timelineCanvas = document.getElementById('timeline-chart');
+    const timelineCtx = timelineCanvas.getContext('2d');
+
+    // Base default values
+    const Q_0 = 10000; // Base quantity demand at base price
+    const seasonalFactors = [0.9, 0.85, 1.0, 1.05, 1.1, 0.95, 0.9, 0.8, 1.0, 1.15, 1.3, 1.4];
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    let activeVisualization = 'curves'; // 'curves', 'heatmap', or '3d'
+    let activeModel = 'linear'; // 'linear' or 'constant'
+
+    // 3D Projection state
+    let yaw = 0.55; // Yaw rotation around vertical axis (radians)
+    let pitch = 0.45; // Pitch rotation around horizontal axis (radians)
+    let isDragging3D = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+
+    // Hover variables for Curves view tooltip
+    let hoverX = null;
+    let hoverY = null;
+
+    // Canvas Mouse listeners for hover tracking and 3D drags
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      if (activeVisualization === '3d') {
+        if (isDragging3D) {
+          const dx = e.clientX - dragStartX;
+          const dy = e.clientY - dragStartY;
+          yaw += dx * 0.007;
+          pitch += dy * 0.007;
+          pitch = Math.max(0.15, Math.min(Math.PI / 2 - 0.15, pitch)); // bound pitch
+          dragStartX = e.clientX;
+          dragStartY = e.clientY;
+          calculateSystem();
+        }
+      } else if (activeVisualization === 'curves') {
+        hoverX = e.offsetX;
+        hoverY = e.offsetY;
+        calculateSystem();
+      }
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (activeVisualization === '3d') {
+        isDragging3D = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+      } else if (activeVisualization === 'curves') {
+        hoverX = e.offsetX;
+        hoverY = e.offsetY;
+        calculateSystem();
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging3D = false;
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      hoverX = null;
+      hoverY = null;
+      calculateSystem();
+    });
+
+    // Auto-rotation loop for 3D Profit Surface
+    function autoRotate3D() {
+      if (activeVisualization === '3d' && !isDragging3D) {
+        yaw += 0.002; // slow yaw spin
+        calculateSystem();
+      }
+      requestAnimationFrame(autoRotate3D);
+    }
+    requestAnimationFrame(autoRotate3D);
+
+    // Segment controls
+    document.querySelectorAll('#toggle-segment .segment-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('#toggle-segment .segment-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applySegmentPreset(btn.dataset.segment);
+      });
+    });
+
+    document.querySelectorAll('#toggle-curve-model .segment-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('#toggle-curve-model .segment-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeModel = btn.dataset.model;
+        calculateSystem();
+      });
+    });
+
+    const btnCurves = document.getElementById('btn-show-curves');
+    const btnHeatmap = document.getElementById('btn-show-heatmap');
+    const btn3D = document.getElementById('btn-show-3d');
+    const legendNormal = document.getElementById('legend-normal-view');
+    const legendHeatmap = document.getElementById('legend-heatmap-view');
+    const legend3D = document.getElementById('legend-3d-view');
+
+    btnCurves.addEventListener('click', () => {
+      btnCurves.classList.add('active');
+      btnHeatmap.classList.remove('active');
+      btn3D.classList.remove('active');
+      legendNormal.style.display = 'flex';
+      legendHeatmap.style.display = 'none';
+      legend3D.style.display = 'none';
+      activeVisualization = 'curves';
+      calculateSystem();
+    });
+
+    btnHeatmap.addEventListener('click', () => {
+      btnHeatmap.classList.add('active');
+      btnCurves.classList.remove('active');
+      btn3D.classList.remove('active');
+      legendNormal.style.display = 'none';
+      legendHeatmap.style.display = 'flex';
+      legend3D.style.display = 'none';
+      activeVisualization = 'heatmap';
+      calculateSystem();
+    });
+
+    btn3D.addEventListener('click', () => {
+      btn3D.classList.add('active');
+      btnCurves.classList.remove('active');
+      btnHeatmap.classList.remove('active');
+      legendNormal.style.display = 'none';
+      legendHeatmap.style.display = 'none';
+      legend3D.style.display = 'flex';
+      activeVisualization = '3d';
+      calculateSystem();
+    });
+
+    // Copy to Clipboard JSON action
+    const btnCopyJson = document.getElementById('btn-copy-json');
+    if (btnCopyJson) {
+      btnCopyJson.addEventListener('click', () => {
+        const jsonText = document.getElementById('api-response-json').textContent;
+        navigator.clipboard.writeText(jsonText).then(() => {
+          btnCopyJson.textContent = "Copied!";
+          btnCopyJson.style.borderColor = "var(--teal)";
+          btnCopyJson.style.color = "var(--teal)";
+          setTimeout(() => {
+            btnCopyJson.textContent = "Copy Schema";
+            btnCopyJson.style.borderColor = "rgba(246, 220, 172, 0.2)";
+            btnCopyJson.style.color = "";
+          }, 1500);
+        }).catch(err => {
+          console.error("Could not copy:", err);
+        });
+      });
+    }
+
+    function applySegmentPreset(segment) {
+      if (segment === 'enterprise') {
+        pBaseInput.value = 800;
+        pCostInput.value = 300;
+        pElasticityInput.value = -0.8;
+        pCompInput.value = 900;
+      } else if (segment === 'mass') {
+        pBaseInput.value = 500;
+        pCostInput.value = 200;
+        pElasticityInput.value = -1.5;
+        pCompInput.value = 550;
+      } else if (segment === 'discount') {
+        pBaseInput.value = 300;
+        pCostInput.value = 100;
+        pElasticityInput.value = -2.5;
+        pCompInput.value = 320;
+      }
+      pChangeInput.value = 0;
+      calculateSystem();
+    }
+
+    function calculateSystem() {
+      const Pc = parseFloat(pCompInput.value);
+      const P_0 = parseFloat(pBaseInput.value);
+      const C = parseFloat(pCostInput.value);
+      const E = parseFloat(pElasticityInput.value);
+      const deltaPercent = parseFloat(pChangeInput.value);
+
+      // Validate inputs: unit cost cannot exceed base price - ₹20
+      if (C >= P_0) {
+        pCostInput.value = P_0 - 20;
+        calculateSystem();
+        return;
+      }
+
+      // Update text values in control panel
+      vBasePrice.textContent = `₹${P_0.toFixed(2)}`;
+      vUnitCost.textContent = `₹${C.toFixed(2)}`;
+      vElasticity.textContent = E.toFixed(2);
+      vCompPrice.textContent = `₹${Pc.toFixed(2)}`;
+      vPriceChange.textContent = (deltaPercent >= 0 ? '+' : '') + deltaPercent + '%';
+
+      // Current values
+      const currentPrice = P_0 * (1 + deltaPercent / 100);
+      
+      // Demand Model calculations (Shifted by competitor price)
+      const getDemand = (p) => {
+        // Higher competitor price shifts our demand curve outwards (positive relationship)
+        const Q_0_adj = Q_0 * (1 + 0.35 * (Pc - 550) / 550);
+        if (activeModel === 'linear') {
+          const q = Q_0_adj * (1 + E * (p - P_0) / P_0);
+          return Math.max(0, q);
+        } else {
+          // Constant Elasticity model Q(P) = Q0_adj * (P/P0)^E
+          if (p <= 5) return Q_0_adj * 10;
+          const q = Q_0_adj * Math.pow(p / P_0, E);
+          return Math.max(0, Math.min(Q_0_adj * 5, q));
+        }
+      };
+
+      const currentDemand = getDemand(currentPrice);
+      const currentRevenue = currentPrice * currentDemand;
+      const currentProfit = (currentPrice - C) * currentDemand;
+
+      // Update Dashboard Metric Boxes
+      mPrice.textContent = `₹${currentPrice.toFixed(2)}`;
+      mDemand.textContent = Math.round(currentDemand).toLocaleString('en-IN');
+      mRevenue.textContent = `₹${Math.round(currentRevenue).toLocaleString('en-IN')}`;
+      mProfit.textContent = `₹${Math.round(currentProfit).toLocaleString('en-IN')}`;
+
+      // Calculate deltas relative to baseline price delta=0%
+      const baseDemand = getDemand(P_0);
+      const baseRevenue = P_0 * baseDemand;
+      const baseProfit = (P_0 - C) * baseDemand;
+
+      updateDelta(dPrice, currentPrice - P_0, (currentPrice - P_0) / P_0 * 100, "₹");
+      updateDelta(dDemand, currentDemand - baseDemand, baseDemand > 0 ? (currentDemand - baseDemand) / baseDemand * 100 : 0, "");
+      updateDelta(dRevenue, currentRevenue - baseRevenue, baseRevenue > 0 ? (currentRevenue - baseRevenue) / baseRevenue * 100 : 0, "₹");
+      updateDelta(dProfit, currentProfit - baseProfit, baseProfit > 0 ? (currentProfit - baseProfit) / baseProfit * 100 : 0, "₹");
+
+      // Optimization calculations
+      let P_max, P_opt;
+      if (activeModel === 'linear') {
+        P_max = P_0 * (1 - 1 / E);
+        P_opt = (C + P_max) / 2;
+        optExp.innerHTML = `<strong>Midpoint Theorem:</strong> Under a linear model, the optimal price is exactly halfway between the unit cost (C) and the reservation price (P<sub>max</sub> = P₀ × (1 - 1/PED)).`;
+      } else {
+        P_max = P_0 * 3.0; // graphical upper limit
+        if (E < -1.0) {
+          P_opt = (C * E) / (E + 1);
+        } else {
+          P_opt = C * 2; // benchmark markup rule if PED is inelastic (diverges mathematically)
+        }
+        optExp.innerHTML = `<strong>Constant Elasticity Model:</strong> Optimal price is calculated as C × (PED / (PED + 1)), maximizing yields where consumers are sensitive to adjustments (PED < -1).`;
+      }
+      const optDemand = getDemand(P_opt);
+      const optProfit = (P_opt - C) * optDemand;
+
+      oPrice.textContent = `₹${P_opt.toFixed(2)}`;
+      oProfit.textContent = `₹${Math.round(optProfit).toLocaleString('en-IN')}`;
+
+      // Redraw Canvas
+      drawChart(P_0, C, E, currentPrice, P_opt, P_max, getDemand);
+
+      // Update API Playground Url & Json response
+      updateAPIPlayground(P_0, C, E, Pc, currentPrice, currentDemand, currentRevenue, currentProfit, P_opt, optProfit, baseProfit);
+
+      // Update Seasonal Projection timeline chart
+      updateTimelineChart(currentProfit);
+
+      // Update custom range sliders fill track gradients
+      updateSliderGradients();
+    }
+
+    function updateDelta(element, rawDelta, pctDelta, symbol) {
+      if (rawDelta === 0) {
+        element.textContent = "--";
+        element.className = "metric-delta";
+        return;
+      }
+      
+      const isPositive = rawDelta > 0;
+      const prefix = isPositive ? '+' : '';
+      const formattedVal = Math.round(Math.abs(rawDelta)).toLocaleString('en-IN');
+      element.textContent = `${prefix}${symbol}${formattedVal} (${prefix}${pctDelta.toFixed(1)}%)`;
+      element.className = `metric-delta ${isPositive ? 'delta-positive' : 'delta-negative'}`;
+    }
+
+    function updateSliderGradients() {
+      [pBaseInput, pCostInput, pElasticityInput, pCompInput, pChangeInput].forEach(slider => {
+        const min = parseFloat(slider.min) || 0;
+        const max = parseFloat(slider.max) || 100;
+        const val = parseFloat(slider.value) || 0;
+        const pct = ((val - min) / (max - min)) * 100;
+        slider.style.setProperty('--value-pct', `${pct}%`);
+      });
+    }
+
+    function drawChart(P_0, C, E, currentPrice, P_opt, P_max, getDemand) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Scale canvas context for sharpness on high-resolution screens
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+
+      // Coordinate Padding
+      const pad = { top: 35, right: 65, bottom: 45, left: 65 };
+      const cw = w - pad.left - pad.right;
+      const ch = h - pad.top - pad.bottom;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Graph limits
+      const xMax = P_max * 1.15;
+      const getProfit = (p) => (p - C) * getDemand(p);
+      const maxProfit = getProfit(P_opt);
+
+      // 1. --- 3D PROFIT SURFACE VIEW ---
+      if (activeVisualization === '3d') {
+        const cosYaw = Math.cos(yaw);
+        const sinYaw = Math.sin(yaw);
+        const cosPitch = Math.cos(pitch);
+        const sinPitch = Math.sin(pitch);
+
+        const project = (pVal, cVal, profVal) => {
+          // Map to centered coordinates: X in [-90, 90], Z in [-90, 90], Y (height) in [-45, 45]
+          const X = (pVal / xMax) * 180 - 90;
+          const Z = (cVal / (xMax * 0.8)) * 180 - 90;
+          const pctProf = maxProfit > 0 ? (profVal / maxProfit) : 0;
+          const Y = pctProf * 90 - 45; // peak is at Y = +45, zero is at Y = -45
+
+          // Y rotation (yaw)
+          const rotX = X * cosYaw - Z * sinYaw;
+          const tempZ = X * sinYaw + Z * cosYaw;
+
+          // X rotation (pitch)
+          const rotY = Y * cosPitch - tempZ * sinPitch;
+          const rotZ = Y * sinPitch + tempZ * cosPitch;
+
+          // Perspective scaling
+          const distance = 280;
+          const scale = 360;
+          const projX = w / 2 + (rotX * scale) / (rotZ + distance);
+          const projY = h / 2 - (rotY * scale) / (rotZ + distance) + 10; // offset down slightly
+          return { x: projX, y: projY, z: rotZ, profit: profVal };
+        };
+
+        // Draw 3D Grid mesh lines
+        const stepsP = 22;
+        const stepsC = 16;
+
+        // X-parallel wireframe lines (along Price)
+        for (let j = 0; j < stepsC; j++) {
+          const cVal = (j / (stepsC - 1)) * (xMax * 0.8);
+          let prev = null;
+          for (let i = 0; i < stepsP; i++) {
+            const pVal = (i / (stepsP - 1)) * xMax;
+            const dem = getDemand(pVal);
+            const prof = (pVal > cVal && dem > 0) ? (pVal - cVal) * dem : 0;
+            const pt = project(pVal, cVal, prof);
+
+            if (prev) {
+              ctx.beginPath();
+              ctx.moveTo(prev.x, prev.y);
+              ctx.lineTo(pt.x, pt.y);
+              const pct = maxProfit > 0 ? Math.max(0, Math.min(1, prof / maxProfit)) : 0;
+              // Fade out mesh segments deep in negative or low profit zones
+              const alpha = 0.12 + pct * 0.7;
+              ctx.strokeStyle = `hsla(${210 - pct * 175}, 75%, 52%, ${alpha})`;
+              ctx.lineWidth = 1 + pct * 0.8;
+              ctx.stroke();
+            }
+            prev = pt;
+          }
+        }
+
+        // Z-parallel wireframe lines (along Cost)
+        for (let i = 0; i < stepsP; i++) {
+          const pVal = (i / (stepsP - 1)) * xMax;
+          const dem = getDemand(pVal);
+          let prev = null;
+          for (let j = 0; j < stepsC; j++) {
+            const cVal = (j / (stepsC - 1)) * (xMax * 0.8);
+            const prof = (pVal > cVal && dem > 0) ? (pVal - cVal) * dem : 0;
+            const pt = project(pVal, cVal, prof);
+
+            if (prev) {
+              ctx.beginPath();
+              ctx.moveTo(prev.x, prev.y);
+              ctx.lineTo(pt.x, pt.y);
+              const pct = maxProfit > 0 ? Math.max(0, Math.min(1, prof / maxProfit)) : 0;
+              const alpha = 0.12 + pct * 0.7;
+              ctx.strokeStyle = `hsla(${210 - pct * 175}, 75%, 52%, ${alpha})`;
+              ctx.lineWidth = 1 + pct * 0.8;
+              ctx.stroke();
+            }
+            prev = pt;
+          }
+        }
+
+        // Draw coordinate axes vectors in 3D space
+        const origin = project(0, 0, 0);
+        const axisP = project(xMax, 0, 0);
+        const axisC = project(0, xMax * 0.8, 0);
+        const axisY = project(0, 0, maxProfit);
+
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([2, 4]);
+
+        // Price Axis (X)
+        ctx.strokeStyle = 'rgba(246, 220, 172, 0.4)';
+        ctx.beginPath(); ctx.moveTo(origin.x, origin.y); ctx.lineTo(axisP.x, axisP.y); ctx.stroke();
+
+        // Cost Axis (Z)
+        ctx.strokeStyle = 'rgba(246, 220, 172, 0.4)';
+        ctx.beginPath(); ctx.moveTo(origin.x, origin.y); ctx.lineTo(axisC.x, axisC.y); ctx.stroke();
+
+        // Height Profit Axis (Y)
+        ctx.strokeStyle = 'rgba(2, 131, 145, 0.4)';
+        ctx.beginPath(); ctx.moveTo(origin.x, origin.y); ctx.lineTo(axisY.x, axisY.y); ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Label axes at projection ends
+        ctx.font = '8px "JetBrains Mono", monospace';
+        ctx.fillStyle = 'rgba(246, 220, 172, 0.6)';
+        ctx.fillText("Price →", axisP.x + 4, axisP.y + 4);
+        ctx.fillText("Cost ↗", axisC.x - 30, axisC.y + 4);
+        ctx.fillStyle = 'rgba(2, 131, 145, 0.8)';
+        ctx.fillText("Profit ↑", axisY.x - 15, axisY.y - 6);
+
+        // Plot Scenario Nodes: Current Scenario vs Optimal Solution
+        const curProf = (currentPrice > C && getDemand(currentPrice) > 0) ? (currentPrice - C) * getDemand(currentPrice) : 0;
+        const ptCurrent = project(currentPrice, C, curProf);
+        const ptOptimal = project(P_opt, C, maxProfit);
+
+        // Vertical drop line from Current Scenario node to floor (Y = 0)
+        const ptCurrentFloor = project(currentPrice, C, 0);
+        ctx.strokeStyle = '#F85525';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([2, 2]);
+        ctx.beginPath();
+        ctx.moveTo(ptCurrent.x, ptCurrent.y);
+        ctx.lineTo(ptCurrentFloor.x, ptCurrentFloor.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Draw Current Scenario sphere
+        ctx.fillStyle = '#F85525';
+        ctx.strokeStyle = '#01204E';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(ptCurrent.x, ptCurrent.y, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+        // Vertical drop line from Optimal Price node to floor (Y = 0)
+        const ptOptimalFloor = project(P_opt, C, 0);
+        ctx.strokeStyle = '#FAA968';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([2, 2]);
+        ctx.beginPath();
+        ctx.moveTo(ptOptimal.x, ptOptimal.y);
+        ctx.lineTo(ptOptimalFloor.x, ptOptimalFloor.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Draw Optimal Price sphere
+        ctx.fillStyle = '#FAA968';
+        ctx.strokeStyle = '#01204E';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(ptOptimal.x, ptOptimal.y, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+        // 3D HUD text values
+        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#F85525';
+        ctx.fillText(`Current: ₹${currentPrice.toFixed(0)}`, ptCurrent.x + 8, ptCurrent.y - 4);
+        ctx.fillStyle = '#FAA968';
+        ctx.fillText(`Optimal: ₹${P_opt.toFixed(0)}`, ptOptimal.x + 8, ptOptimal.y - 4);
+
+        return; // done drawing 3D
+      }
+
+      // Value to coordinate converters for 2D views
+      const toX = (val) => pad.left + (val / xMax) * cw;
+      const toYDemand = (val) => pad.top + ch - (val / (Q_0 * 2.2)) * ch;
+      const toYProfit = (val) => {
+        const pScale = Math.max(maxProfit * 1.2, 500000);
+        return pad.top + ch - (val / pScale) * ch;
+      };
+
+      // 2. --- HEATMAP VIEW ---
+      if (activeVisualization === 'heatmap') {
+        const yMaxCost = xMax;
+        const toYCost = (val) => pad.top + ch - (val / yMaxCost) * ch;
+
+        // Draw Heatmap grid cells (70 x 40 resolution)
+        const cellsX = 70;
+        const cellsY = 40;
+        const cellW = cw / cellsX;
+        const cellH = ch / cellsY;
+
+        for (let ix = 0; ix < cellsX; ix++) {
+          const pVal = (ix / cellsX) * xMax;
+          const px = pad.left + ix * cellW;
+          const dem = getDemand(pVal);
+
+          for (let iy = 0; iy < cellsY; iy++) {
+            const cVal = (1 - iy / cellsY) * yMaxCost;
+            const py = pad.top + iy * cellH;
+
+            if (cVal >= pVal || dem <= 0) {
+              continue;
+            }
+
+            const profit = (pVal - cVal) * dem;
+            const pct = Math.max(0, Math.min(1, profit / maxProfit));
+            const hColor = 210 - pct * 175;
+            ctx.fillStyle = `hsla(${hColor}, 75%, 52%, ${0.15 + pct * 0.75})`;
+            ctx.fillRect(px, py, cellW + 0.5, cellH + 0.5);
+          }
+        }
+
+        // Draw Gridlines
+        ctx.strokeStyle = 'rgba(246, 220, 172, 0.06)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+          const yVal = pad.top + (ch / 4) * i;
+          ctx.beginPath(); ctx.moveTo(pad.left, yVal); ctx.lineTo(w - pad.right, yVal); ctx.stroke();
+        }
+        for (let i = 0; i <= 5; i++) {
+          const xVal = pad.left + (cw / 5) * i;
+          ctx.beginPath(); ctx.moveTo(xVal, pad.top); ctx.lineTo(xVal, h - pad.bottom); ctx.stroke();
+        }
+
+        // Draw Optimal Price Frontier line P*(C)
+        ctx.strokeStyle = 'rgba(246, 220, 172, 0.55)';
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        let frontierFirst = true;
+        for (let c = 0; c <= yMaxCost; c += yMaxCost / 30) {
+          let pOptC;
+          if (activeModel === 'linear') {
+            pOptC = (c + P_0 * (1 - 1 / E)) / 2;
+          } else {
+            pOptC = E < -1 ? (c * E) / (E + 1) : c * 2;
+          }
+          const x = toX(pOptC);
+          const y = toYCost(c);
+          if (x >= pad.left && x <= w - pad.right && y >= pad.top && y <= h - pad.bottom) {
+            if (frontierFirst) {
+              ctx.moveTo(x, y);
+              frontierFirst = false;
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Plot current scenario node (Current Price, Unit Cost)
+        const currX = toX(currentPrice);
+        const currY = toYCost(C);
+        ctx.fillStyle = '#F85525';
+        ctx.strokeStyle = '#01204E';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(currX, currY, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Label Axes for Heatmap
+        ctx.fillStyle = 'rgba(246, 220, 172, 0.5)';
+        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= 4; i++) {
+          const cVal = yMaxCost * (1 - i / 4);
+          ctx.fillText(`₹${Math.round(cVal).toLocaleString('en-IN')}`, pad.left - 8, pad.top + (ch / 4) * i + 3);
+        }
+
+        ctx.textAlign = 'left';
+        ctx.fillText("Max Profit", w - pad.right + 8, pad.top + 3);
+        ctx.fillText(`₹${Math.round(maxProfit).toLocaleString('en-IN')}`, w - pad.right + 8, pad.top + 15);
+
+        ctx.textAlign = 'center';
+        for (let i = 0; i <= 5; i++) {
+          const pVal = (xMax / 5) * i;
+          ctx.fillText(`₹${pVal.toFixed(0)}`, pad.left + (cw / 5) * i, h - pad.bottom + 16);
+        }
+
+        ctx.font = '10px "Space Grotesk", sans-serif';
+        ctx.fillStyle = 'rgba(246, 220, 172, 0.7)';
+        ctx.save();
+        ctx.translate(14, pad.top + ch / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText("Unit Cost (₹)", 0, 0);
+        ctx.restore();
+
+        ctx.fillText("Price (₹)", pad.left + cw / 2, h - 8);
+
+      } else {
+        // --- 2. Draw Normal Elasticity Curves View ---
+        const profitMin = -maxProfit * 0.2;
+        const profitMax = maxProfit * 1.25;
+        const toYProfit = (val) => pad.top + ch - ((val - profitMin) / (profitMax - profitMin)) * ch;
+
+        // Gridlines
+        ctx.strokeStyle = 'rgba(246, 220, 172, 0.08)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+          const yVal = pad.top + (ch / 4) * i;
+          ctx.beginPath(); ctx.moveTo(pad.left, yVal); ctx.lineTo(w - pad.right, yVal); ctx.stroke();
+        }
+        for (let i = 0; i <= 5; i++) {
+          const xVal = pad.left + (cw / 5) * i;
+          ctx.beginPath(); ctx.moveTo(xVal, pad.top); ctx.lineTo(xVal, h - pad.bottom); ctx.stroke();
+        }
+
+        // Axis labels
+        ctx.fillStyle = 'rgba(246, 220, 172, 0.5)';
+        ctx.font = '9px "JetBrains Mono", monospace';
+        ctx.textAlign = 'right';
+        
+        for (let i = 0; i <= 4; i++) {
+          const dVal = (Q_0 * 2.2) * (1 - i / 4);
+          ctx.fillText(Math.round(dVal).toLocaleString('en-IN'), pad.left - 8, pad.top + (ch / 4) * i + 3);
+        }
+        
+        ctx.textAlign = 'left';
+        for (let i = 0; i <= 4; i++) {
+          const pVal = profitMax - ((profitMax - profitMin) / 4) * i;
+          ctx.fillText(`₹${Math.round(pVal).toLocaleString('en-IN')}`, w - pad.right + 8, pad.top + (ch / 4) * i + 3);
+        }
+
+        ctx.textAlign = 'center';
+        for (let i = 0; i <= 5; i++) {
+          const pVal = (xMax / 5) * i;
+          ctx.fillText(`₹${pVal.toFixed(0)}`, pad.left + (cw / 5) * i, h - pad.bottom + 16);
+        }
+
+        ctx.font = '10px "Space Grotesk", sans-serif';
+        ctx.fillStyle = 'rgba(246, 220, 172, 0.7)';
+        
+        ctx.save();
+        ctx.translate(14, pad.top + ch / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText("Demand (Units)", 0, 0);
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(w - 14, pad.top + ch / 2);
+        ctx.rotate(Math.PI / 2);
+        ctx.fillText("Profit (₹)", 0, 0);
+        ctx.restore();
+
+        ctx.fillText("Price (₹)", pad.left + cw / 2, h - 8);
+
+        // Plot Demand Curve
+        ctx.strokeStyle = '#028391';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        let demandFirst = true;
+        for (let p = 0; p <= P_max; p += P_max / 80) {
+          const x = toX(p);
+          const y = toYDemand(getDemand(p));
+          if (x >= pad.left && x <= w - pad.right) {
+            if (demandFirst) {
+              ctx.moveTo(x, y);
+              demandFirst = false;
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+        }
+        ctx.stroke();
+
+        // Plot Profit Curve
+        ctx.strokeStyle = '#FAA968';
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        let profitFirst = true;
+        for (let p = 0; p <= P_max; p += P_max / 80) {
+          const x = toX(p);
+          const y = toYProfit(getProfit(p));
+          if (x >= pad.left && x <= w - pad.right && y >= pad.top && y <= h - pad.bottom) {
+            if (profitFirst) {
+              ctx.moveTo(x, y);
+              profitFirst = false;
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Optimal Price Line
+        ctx.strokeStyle = 'rgba(246, 220, 172, 0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(toX(P_opt), pad.top);
+        ctx.lineTo(toX(P_opt), h - pad.bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Optimal Profit Node
+        ctx.fillStyle = '#FAA968';
+        ctx.beginPath();
+        ctx.arc(toX(P_opt), toYProfit(maxProfit), 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Current Price Line
+        ctx.strokeStyle = '#F85525';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(toX(currentPrice), pad.top);
+        ctx.lineTo(toX(currentPrice), h - pad.bottom);
+        ctx.stroke();
+
+        const currDemand = getDemand(currentPrice);
+        const currProfit = getProfit(currentPrice);
+
+        ctx.fillStyle = '#028391';
+        ctx.strokeStyle = '#01204E';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(toX(currentPrice), toYDemand(currDemand), 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#FAA968';
+        ctx.strokeStyle = '#01204E';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(toX(currentPrice), toYProfit(currProfit), 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // 4. --- MOUSE HOVER GUIDE & HUD CARD DRAWING ---
+        if (hoverX !== null && hoverX >= pad.left && hoverX <= w - pad.right) {
+          const pHover = ((hoverX - pad.left) / cw) * xMax;
+          if (pHover >= 0 && pHover <= P_max) {
+            const demHover = getDemand(pHover);
+            const profHover = getProfit(pHover);
+
+            const hX = toX(pHover);
+            const yDem = toYDemand(demHover);
+            const yProf = toYProfit(profHover);
+
+            // Draw vertical guide line
+            ctx.strokeStyle = 'rgba(246, 220, 172, 0.22)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 3]);
+            ctx.beginPath();
+            ctx.moveTo(hX, pad.top);
+            ctx.lineTo(hX, h - pad.bottom);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw intersection dots
+            ctx.fillStyle = '#01204E';
+            ctx.lineWidth = 1.5;
+
+            ctx.strokeStyle = '#028391';
+            ctx.beginPath(); ctx.arc(hX, yDem, 4.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+            ctx.strokeStyle = '#FAA968';
+            ctx.beginPath(); ctx.arc(hX, yProf, 4.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+            // Render HUD Tooltip Card on Canvas
+            const cardW = 125;
+            const cardH = 56;
+            let cardX = hX + 12;
+            if (cardX + cardW > w - pad.right + 25) {
+              cardX = hX - cardW - 12; // Flip to left side
+            }
+            let cardY = hoverY - cardH / 2;
+            if (cardY < pad.top) cardY = pad.top;
+            if (cardY + cardH > h - pad.bottom) cardY = h - pad.bottom - cardH;
+
+            // Drawing glassmorphic box
+            ctx.fillStyle = 'rgba(1, 23, 56, 0.93)';
+            ctx.strokeStyle = 'rgba(2, 131, 145, 0.6)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.roundRect(cardX, cardY, cardW, cardH, 5);
+            ctx.fill();
+            ctx.stroke();
+
+            // Draw text values
+            ctx.font = '8px "JetBrains Mono", monospace';
+            ctx.textAlign = 'left';
+
+            ctx.fillStyle = 'rgba(246, 220, 172, 0.55)';
+            ctx.fillText("Price", cardX + 8, cardY + 14);
+            ctx.fillStyle = '#F6DCA2';
+            ctx.fillText(`₹${pHover.toFixed(2)}`, cardX + 48, cardY + 14);
+
+            ctx.fillStyle = 'rgba(246, 220, 172, 0.55)';
+            ctx.fillText("Demand", cardX + 8, cardY + 28);
+            ctx.fillStyle = '#028391';
+            ctx.fillText(Math.round(demHover).toLocaleString('en-IN'), cardX + 48, cardY + 28);
+
+            ctx.fillStyle = 'rgba(246, 220, 172, 0.55)';
+            ctx.fillText("Profit", cardX + 8, cardY + 42);
+            ctx.fillStyle = '#FAA968';
+            ctx.fillText(`₹${Math.round(profHover).toLocaleString('en-IN')}`, cardX + 48, cardY + 42);
+          }
+        }
+      }
+    }
+
+    function updateAPIPlayground(P_0, C, E, Pc, currentPrice, currentDemand, currentRevenue, currentProfit, P_opt, optProfit, baseProfit) {
+      const reqUrl = document.getElementById('api-request-url');
+      const resJson = document.getElementById('api-response-json');
+      
+      const cleanUrl = `https://api.optiprice.ai/v1/optimize?base_price=${P_0.toFixed(0)}&cost=${C.toFixed(0)}&elasticity=${E.toFixed(2)}&competitor=${Pc.toFixed(0)}&model=${activeModel}`;
+      reqUrl.textContent = cleanUrl;
+
+      const deltaProfitPercent = baseProfit > 0 ? ((optProfit - baseProfit) / baseProfit * 100) : 0;
+
+      const responseObj = {
+        "status": "success",
+        "data": {
+          "engine": "optiprice-v2.1",
+          "parameters": {
+            "base_price": P_0,
+            "unit_cost": C,
+            "elasticity": E,
+            "competitor_price": Pc,
+            "model": activeModel
+          },
+          "simulation": {
+            "current_price": parseFloat(currentPrice.toFixed(2)),
+            "projected_demand": Math.round(currentDemand),
+            "projected_revenue": Math.round(currentRevenue),
+            "projected_profit": Math.round(currentProfit)
+          },
+          "optimization": {
+            "optimal_price": parseFloat(P_opt.toFixed(2)),
+            "max_profit": Math.round(optProfit),
+            "margin_delta_percent": parseFloat(deltaProfitPercent.toFixed(1))
+          }
+        }
+      };
+
+      resJson.textContent = JSON.stringify(responseObj, null, 2);
+    }
+
+    function updateTimelineChart(activeProfit) {
+      const rect = timelineCanvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      timelineCanvas.width = rect.width * dpr;
+      timelineCanvas.height = rect.height * dpr;
+      timelineCtx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      timelineCtx.clearRect(0, 0, w, h);
+
+      const pad = { top: 15, right: 15, bottom: 20, left: 55 };
+      const cw = w - pad.left - pad.right;
+      const ch = h - pad.top - pad.bottom;
+
+      // Draw gridlines
+      timelineCtx.strokeStyle = 'rgba(246, 220, 172, 0.05)';
+      timelineCtx.lineWidth = 1;
+      for (let i = 0; i <= 2; i++) {
+        const yVal = pad.top + (ch / 2) * i;
+        timelineCtx.beginPath(); timelineCtx.moveTo(pad.left, yVal); timelineCtx.lineTo(w - pad.right, yVal); timelineCtx.stroke();
+      }
+
+      const monthlyValues = seasonalFactors.map(f => activeProfit * f);
+      const maxVal = Math.max(...monthlyValues, 100000) * 1.15;
+
+      const barSpacing = cw / 12;
+      const barW = barSpacing * 0.6;
+
+      timelineCtx.font = '8px "JetBrains Mono", monospace';
+      timelineCtx.fillStyle = 'rgba(246, 220, 172, 0.4)';
+      timelineCtx.textAlign = 'right';
+
+      // Y Axis labels
+      timelineCtx.fillText(`₹${Math.round(maxVal/100000).toLocaleString('en-IN')}L`, pad.left - 6, pad.top + 3);
+      timelineCtx.fillText(`₹${Math.round(maxVal/200000).toLocaleString('en-IN')}L`, pad.left - 6, pad.top + ch/2 + 3);
+      timelineCtx.fillText("₹0", pad.left - 6, pad.top + ch + 3);
+
+      for (let i = 0; i < 12; i++) {
+        const val = monthlyValues[i];
+        const barH = (val / maxVal) * ch;
+        const x = pad.left + barSpacing * i + (barSpacing - barW) / 2;
+        const y = pad.top + ch - barH;
+
+        // Dynamic gradients
+        const grad = timelineCtx.createLinearGradient(x, y, x, pad.top + ch);
+        grad.addColorStop(0, '#028391');
+        grad.addColorStop(1, 'rgba(2, 131, 145, 0.05)');
+
+        timelineCtx.fillStyle = grad;
+        timelineCtx.fillRect(x, y, barW, barH);
+
+        timelineCtx.strokeStyle = 'rgba(2, 131, 145, 0.3)';
+        timelineCtx.strokeRect(x, y, barW, barH);
+
+        timelineCtx.fillStyle = 'rgba(246, 220, 172, 0.5)';
+        timelineCtx.textAlign = 'center';
+        timelineCtx.fillText(monthNames[i], x + barW / 2, h - 5);
+      }
+    }
+
+    // Input event listeners
+    [pBaseInput, pCostInput, pElasticityInput, pCompInput, pChangeInput].forEach(slider => {
+      slider.addEventListener('input', calculateSystem);
+    });
+
+    // Reset button
+    document.getElementById('reset-lab-btn').addEventListener('click', () => {
+      document.querySelectorAll('#toggle-segment .segment-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('#toggle-segment .segment-btn[data-segment="mass"]').classList.add('active');
+      
+      document.querySelectorAll('#toggle-curve-model .segment-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('#toggle-curve-model .segment-btn[data-model="linear"]').classList.add('active');
+      activeModel = 'linear';
+
+      pBaseInput.value = 500;
+      pCostInput.value = 200;
+      pElasticityInput.value = -1.5;
+      pCompInput.value = 550;
+      pChangeInput.value = 0;
+      calculateSystem();
+    });
+
+    // Schema mapper interactive logic
+    const schemaRows = document.querySelectorAll('.schema-mapping-row');
+    const previewTitle = document.getElementById('mapper-preview-title');
+    const previewCode = document.getElementById('mapper-preview-code');
+
+    const schemaInfo = {
+      price: {
+        title: "API Field: price_base",
+        code: {
+          "source": "shopify_orders.price_usd",
+          "type": "FLOAT",
+          "description": "Base pricing baseline benchmark drawn from ecommerce catalog logs.",
+          "mapped_value": 500
+        }
+      },
+      cost: {
+        title: "API Field: price_cost",
+        code: {
+          "source": "inventory.cost_of_goods",
+          "type": "FLOAT",
+          "description": "Marginal cost of product used for calculating optimization spreads.",
+          "mapped_value": 200
+        }
+      },
+      qty: {
+        title: "API Field: demand_q",
+        code: {
+          "source": "order_items.quantity",
+          "type": "INTEGER",
+          "description": "Baseline transaction volumes corresponding to base prices.",
+          "mapped_value": 10000
+        }
+      },
+      comp: {
+        title: "API Field: competitor_price",
+        code: {
+          "source": "competitor_scrapers.lowest_price",
+          "type": "FLOAT",
+          "description": "Scraped pricing index of identical competitor product catalogs.",
+          "mapped_value": 550
+        }
+      }
+    };
+
+    schemaRows.forEach(row => {
+      row.addEventListener('click', () => {
+        schemaRows.forEach(r => r.classList.remove('active'));
+        row.classList.add('active');
+        const field = row.dataset.field;
+        
+        // Feed live slider values to mapping
+        schemaInfo.price.code.mapped_value = parseFloat(pBaseInput.value);
+        schemaInfo.cost.code.mapped_value = parseFloat(pCostInput.value);
+        schemaInfo.comp.code.mapped_value = parseFloat(pCompInput.value);
+
+        previewTitle.textContent = schemaInfo[field].title;
+        previewCode.textContent = JSON.stringify(schemaInfo[field].code, null, 2);
+      });
+    });
+
+    // Initialization
+    window.addEventListener('resize', () => {
+      calculateSystem();
+    });
+    // Delay slightly to ensure box layout yields correct dimensions
+    setTimeout(calculateSystem, 100);
+
+    /* ----------------------------------------------------
+       5. HOVER-TILT CARD ANIMATION (PROJECTS)
+       ---------------------------------------------------- */
+    const cards = document.querySelectorAll('.project-card');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        // Mouse coordinate relative to card
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Find centers
+        const xc = rect.width / 2;
+        const yc = rect.height / 2;
+        
+        // Calculate offsets
+        const dx = x - xc;
+        const dy = y - yc;
+        
+        // Map offsets to tilt angles (max 10deg rotation)
+        const rotX = -(dy / yc) * 6;
+        const rotY = (dx / xc) * 6;
+        
+        card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-6px)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(800px) rotateX(0) rotateY(0) translateY(0)';
+      });
+    });
+
+    /* ----------------------------------------------------
+       6. CONTACT FORM VALIDATION & TERMINAL LOADER
+       ---------------------------------------------------- */
+    const contactForm = document.getElementById('contact-form');
+    const successTerminal = document.getElementById('success-terminal');
+
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const nameVal = document.getElementById('form-name').value.trim();
+      const emailVal = document.getElementById('form-email').value.trim();
+      const msgVal = document.getElementById('form-msg').value.trim();
+      const challengeVal = document.getElementById('form-challenge').value;
+
+      // Validate states
+      let isValid = true;
+
+      if (!nameVal) {
+        showError('err-name', true);
+        isValid = false;
+      } else {
+        showError('err-name', false);
+      }
+
+      if (!emailVal || !validateEmail(emailVal)) {
+        showError('err-email', true);
+        isValid = false;
+      } else {
+        showError('err-email', false);
+      }
+
+      if (!msgVal) {
+        showError('err-msg', true);
+        isValid = false;
+      } else {
+        showError('err-msg', false);
+      }
+
+      if (isValid) {
+        // Trigger success pipeline logs
+        contactForm.style.display = 'none';
+        successTerminal.style.display = 'block';
+        successTerminal.innerHTML = ""; // Clear existing
+
+        const logs = [
+          { text: "[INFO] Initializing OptiPrice API handshake...", delay: 200 },
+          { text: "[INFO] Encrypting connection payload...", delay: 350 },
+          { text: `[INFO] Routing request payload: Target = '${challengeVal}'`, delay: 250 },
+          { text: "[INFO] Handshake established with optiprice-api.io via TLS...", delay: 400 },
+          { text: "[SUCCESS] Secure request logged safely.", delay: 200, class: "success-done" },
+          { text: `[SUCCESS] Thank you, ${nameVal}. A pricing specialist will reach out within 24 hours.`, delay: 100, class: "success-accent" }
+        ];
+
+        let logIdx = 0;
+        function renderLogs() {
+          if (logIdx < logs.length) {
+            const line = logs[logIdx];
+            const div = document.createElement('div');
+            div.className = `terminal-line ${line.class || ''}`;
+            div.textContent = line.text;
+            div.style.animation = "terminal-fade 0.3s forwards";
+            successTerminal.appendChild(div);
+            
+            logIdx++;
+            setTimeout(renderLogs, line.delay);
+          }
+        }
+        renderLogs();
+      }
+    });
+
+    function showError(id, show) {
+      document.getElementById(id).style.display = show ? 'block' : 'none';
+    }
+
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    /* ----------------------------------------------------
+       7. MOBILE NAVIGATION MENU
+       ---------------------------------------------------- */
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    menuToggle.addEventListener('click', () => {
+      const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+      menuToggle.setAttribute('aria-expanded', !isExpanded);
+      
+      if (!isExpanded) {
+        navLinks.style.display = 'flex';
+        navLinks.style.flexDirection = 'column';
+        navLinks.style.position = 'absolute';
+        navLinks.style.top = '100%';
+        navLinks.style.left = '0';
+        navLinks.style.width = '100%';
+        navLinks.style.backgroundColor = 'var(--navy-dark)';
+        navLinks.style.padding = '20px';
+        navLinks.style.borderBottom = '1px solid rgba(246, 220, 172, 0.1)';
+        navLinks.style.gap = '20px';
+      } else {
+        navLinks.style.display = '';
+      }
+    });
+
+    // Close menu when clicking link
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          navLinks.style.display = '';
+          menuToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+    /* ----------------------------------------------------
+       8. DATA INTAKE & ELASTICITY ENGINE WORKFLOW
+       ---------------------------------------------------- */
+    let currentDatasetId = null;
+    let validationTimer = null;
+    let analysisTimer = null;
+
+    const stepUpload = document.getElementById('intake-step-upload');
+    const stepValidation = document.getElementById('intake-step-validation');
+    const stepFilter = document.getElementById('intake-step-filter');
+    const stepProgress = document.getElementById('intake-step-progress');
+    const stepResults = document.getElementById('intake-step-results');
+
+    const fileInput = document.getElementById('intake-file-input');
+    const dropzone = document.getElementById('upload-dropzone');
+    const btnBrowse = document.getElementById('btn-browse-file');
+    const uploadProgressContainer = document.getElementById('upload-progress-container');
+    const uploadProgressBar = document.getElementById('upload-progress-bar');
+    const uploadStatusText = document.getElementById('upload-status-text');
+
+    const valStatusBadge = document.getElementById('val-status-badge');
+    const valStatRows = document.getElementById('val-stat-rows');
+    const valStatSkus = document.getElementById('val-stat-skus');
+    const valStatMissingCols = document.getElementById('val-stat-missing-cols');
+    const validationIssuesList = document.getElementById('validation-issues-list');
+    const blockingInquiryBox = document.getElementById('blocking-inquiry-box');
+    const btnValProceedFilter = document.getElementById('btn-val-proceed-filter');
+    const btnValBackUpload = document.getElementById('btn-val-back-upload');
+
+    const supportInquiryForm = document.getElementById('support-inquiry-form');
+    const supportSubject = document.getElementById('support-subject');
+    const supportMessage = document.getElementById('support-message');
+    const supportSuccessBox = document.getElementById('support-success-box');
+
+    const filterExcludeInsufficient = document.getElementById('filter-exclude-insufficient');
+    const filterExcludeMissingOptional = document.getElementById('filter-exclude-missing-optional');
+    const filterStartDate = document.getElementById('filter-start-date');
+    const filterEndDate = document.getElementById('filter-end-date');
+    const filterCategoriesGrid = document.getElementById('filter-categories-grid');
+    const filterStatSummary = document.getElementById('filter-stat-summary');
+    const previewTableBody = document.getElementById('preview-table-body');
+    const btnFilterBackValidation = document.getElementById('btn-filter-back-validation');
+    const btnFilterRunAnalysis = document.getElementById('btn-filter-run-analysis');
+
+    const analysisProgressBar = document.getElementById('analysis-progress-bar');
+    const analysisStatusText = document.getElementById('analysis-status-text');
+
+    const resultsStatAvgPed = document.getElementById('results-stat-avg-ped');
+    const resultsStatSkus = document.getElementById('results-stat-skus');
+    const resultsStatRows = document.getElementById('results-stat-rows');
+    const resultsTableBody = document.getElementById('results-table-body');
+    const btnResultsBackFilter = document.getElementById('btn-results-back-filter');
+    const btnResultsNewUpload = document.getElementById('btn-results-new-upload');
+
+    function showIntakeStep(step) {
+      stepUpload.style.display = step === 'upload' ? 'block' : 'none';
+      stepValidation.style.display = step === 'validation' ? 'block' : 'none';
+      stepFilter.style.display = step === 'filter' ? 'block' : 'none';
+      stepProgress.style.display = step === 'progress' ? 'block' : 'none';
+      stepResults.style.display = step === 'results' ? 'block' : 'none';
+    }
+
+    // Step 1: Upload Events
+    btnBrowse.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        handleFileUpload(fileInput.files[0]);
+      }
+    });
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        handleFileUpload(e.dataTransfer.files[0]);
+      }
+    });
+
+    dropzone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    function handleFileUpload(file) {
+      if (!file.name.endsWith('.csv')) {
+        alert("Only CSV files are supported.");
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('org_id', 'org_default');
+
+      uploadProgressContainer.style.display = 'block';
+      uploadStatusText.style.display = 'block';
+      uploadProgressBar.style.width = '0%';
+      uploadStatusText.textContent = "Uploading dataset...";
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/upload', true);
+
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          uploadProgressBar.style.width = pct + '%';
+          uploadStatusText.textContent = `Uploading dataset: ${pct}%`;
+        }
+      });
+
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          const res = JSON.parse(xhr.responseText);
+          currentDatasetId = res.dataset_id;
+          uploadStatusText.textContent = "Upload complete. Initializing validator...";
+          startValidationPolling();
+        } else {
+          let err = "Upload failed.";
+          try {
+            err = JSON.parse(xhr.responseText).detail || err;
+          } catch(e){}
+          alert(err);
+          uploadProgressContainer.style.display = 'none';
+          uploadStatusText.style.display = 'none';
+        }
+      };
+
+      xhr.onerror = function() {
+        alert("Network error occurred during upload.");
+        uploadProgressContainer.style.display = 'none';
+        uploadStatusText.style.display = 'none';
+      };
+
+      xhr.send(formData);
+    }
+
+    // Step 2: Validation Polling
+    function startValidationPolling() {
+      showIntakeStep('validation');
+      valStatusBadge.textContent = "Validating...";
+      valStatusBadge.className = "conf-badge low";
+      valStatRows.textContent = "Calculating...";
+      valStatSkus.textContent = "Calculating...";
+      valStatMissingCols.textContent = "Checking...";
+      validationIssuesList.innerHTML = "<div class='status-text' style='text-align:center;'>Running file structure, data types, and historical observation checks...</div>";
+      blockingInquiryBox.style.display = 'none';
+      btnValProceedFilter.style.display = 'none';
+      supportSuccessBox.style.display = 'none';
+      supportInquiryForm.style.display = 'block';
+
+      if (validationTimer) clearInterval(validationTimer);
+      
+      validationTimer = setInterval(() => {
+        fetch(`/api/datasets/${currentDatasetId}`)
+          .then(r => r.json())
+          .then(data => {
+            if (data.status === 'failed') {
+              clearInterval(validationTimer);
+              renderValidationReport(data);
+            } else if (data.status === 'filtered' || data.status === 'complete') {
+              clearInterval(validationTimer);
+              renderValidationReport(data);
+            } else {
+              valStatusBadge.textContent = `Validating: ${data.progress_pct}%`;
+            }
+          })
+          .catch(err => {
+            clearInterval(validationTimer);
+            console.error("Error polling validation state:", err);
+          });
+      }, 1000);
+    }
+
+    function renderValidationReport(dataset) {
+      const report = dataset.validation_report;
+      if (!report) {
+        valStatusBadge.textContent = "Failed";
+        valStatusBadge.className = "conf-badge failed";
+        validationIssuesList.innerHTML = `<div class='issue-item error'>
+          <div class='issue-badge error'>System Failure</div>
+          <div>${dataset.error_message || "Dataset processing failed."}</div>
+        </div>`;
+        return;
+      }
+
+      valStatRows.textContent = report.row_count.toLocaleString();
+      valStatSkus.textContent = report.sku_count.toLocaleString();
+      valStatMissingCols.textContent = report.missing_columns && report.missing_columns.length > 0 
+        ? report.missing_columns.join(', ') 
+        : 'None';
+
+      validationIssuesList.innerHTML = "";
+
+      if (report.status === 'blocking_errors') {
+        valStatusBadge.textContent = "Blocking Errors";
+        valStatusBadge.className = "conf-badge failed";
+        btnValProceedFilter.style.display = 'inline-block'; // Allow filtering to exclude blocking rows!
+        
+        // Show Inquiry box
+        blockingInquiryBox.style.display = 'block';
+        supportSubject.value = `[DATA BLOCK] Schema Verification Request - Dataset ID: ${currentDatasetId}`;
+        supportMessage.value = `Dataset: ${dataset.filename}\nErrors identified:\n` + 
+          report.issues.map(i => ` - [${i.severity.toUpperCase()}] ${i.type}: ${i.detail || i.column}`).join('\n') + 
+          `\n\nPlease support manual mapping.`;
+      } else if (report.status === 'issues_found') {
+        valStatusBadge.textContent = "Issues Identified";
+        valStatusBadge.className = "conf-badge low";
+        btnValProceedFilter.style.display = 'inline-block';
+        blockingInquiryBox.style.display = 'none';
+      } else {
+        valStatusBadge.textContent = "Clean";
+        valStatusBadge.className = "conf-badge high";
+        btnValProceedFilter.style.display = 'inline-block';
+        blockingInquiryBox.style.display = 'none';
+      }
+
+      if (report.issues && report.issues.length > 0) {
+        report.issues.forEach(issue => {
+          const item = document.createElement('div');
+          item.className = `issue-item ${issue.severity}`;
+          
+          let skusDetail = "";
+          if (issue.skus && issue.skus.length > 0) {
+            skusDetail = `<br><span style="opacity: 0.8; font-size: 0.75rem;">Affected SKUs (sample): ${issue.skus.join(', ')}</span>`;
+          }
+          
+          item.innerHTML = `
+            <div class="issue-badge ${issue.severity}">${issue.severity}</div>
+            <div>
+              <strong>${issue.type.replace(/_/g, ' ').toUpperCase()}</strong>: 
+              ${issue.detail || `${issue.affected_rows || 0} rows affected.`}
+              ${skusDetail}
+            </div>
+          `;
+          validationIssuesList.appendChild(item);
+        });
+      } else {
+        validationIssuesList.innerHTML = `<div class='issue-item warning' style='background: rgba(2, 131, 145, 0.05); border: 1px solid var(--teal); color: var(--teal-light);'>
+          <div class='issue-badge warning' style='background: var(--teal); color: white;'>Clean</div>
+          <div>Schema validation complete. All required observations mapped successfully with no warnings.</div>
+        </div>`;
+      }
+    }
+
+    // Support Inquiry submission
+    supportInquiryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        org_id: "org_default",
+        user_id: "user_default",
+        dataset_id: currentDatasetId,
+        subject: supportSubject.value,
+        message: supportMessage.value
+      };
+
+      fetch('/api/support-inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'success') {
+          supportInquiryForm.style.display = 'none';
+          supportSuccessBox.style.display = 'block';
+          supportSuccessBox.innerHTML = `
+            <div class="terminal-line">[INFO] Connecting support ticket pipelines...</div>
+            <div class="terminal-line">[INFO] Registering Dataset Reference ID: ${currentDatasetId}</div>
+            <div class="terminal-line">[INFO] Writing inquiry metadata records to SQLite...</div>
+            <div class="terminal-line success-done">[SUCCESS] Inquiry logged under reference ID: ${data.inquiry_id}</div>
+            <div class="terminal-line success-accent">[SUCCESS] An engineer has been notified and will verify your file schema.</div>
+          `;
+        } else {
+          alert("Failed to submit inquiry.");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Error submitting support inquiry.");
+      });
+    });
+
+    btnValBackUpload.addEventListener('click', () => {
+      showIntakeStep('upload');
+      uploadProgressContainer.style.display = 'none';
+      uploadStatusText.style.display = 'none';
+    });
+
+    btnValProceedFilter.addEventListener('click', () => {
+      loadFilterStep();
+    });
+
+    // Step 3: Filter & Preview Setup
+    function loadFilterStep() {
+      showIntakeStep('filter');
+      filterStatSummary.textContent = "Calculating scope...";
+
+      fetch(`/api/datasets/${currentDatasetId}/preview`)
+        .then(r => r.json())
+        .then(data => {
+          // Set date picker defaults
+          filterStartDate.value = data.min_date ? data.min_date.split('T')[0] : '';
+          filterEndDate.value = data.max_date ? data.max_date.split('T')[0] : '';
+
+          // Set duplicate counts
+          const dupCount = data.duplicate_row_count || 0;
+          document.getElementById('dup-count-a').textContent = `(Affects ${dupCount} rows)`;
+          document.getElementById('dup-count-b').textContent = `(Affects ${dupCount} rows)`;
+          document.getElementById('dup-count-c').textContent = `(Affects ${dupCount} rows)`;
+
+          // Render categories
+          filterCategoriesGrid.innerHTML = "";
+          if (data.categories && data.categories.length > 0) {
+            data.categories.forEach(cat => {
+              if (!cat) return;
+              const lbl = document.createElement('label');
+              lbl.className = "checkbox-pill active";
+              lbl.innerHTML = `<input type="checkbox" value="${cat}" checked> ${cat}`;
+              
+              const input = lbl.querySelector('input');
+              input.addEventListener('change', () => {
+                lbl.classList.toggle('active', input.checked);
+                updateFilterStats();
+              });
+
+              filterCategoriesGrid.appendChild(lbl);
+            });
+          } else {
+            filterCategoriesGrid.innerHTML = "<div style='color: var(--cream-dark); font-size: 0.8rem; font-family: var(--font-mono);'>No category columns identified in dataset.</div>";
+          }
+
+          // Render preview table rows
+          previewTableBody.innerHTML = "";
+          data.rows.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${row.sku}</td>
+              <td>${row.date ? row.date.split('T')[0] : ''}</td>
+              <td>$${Number(row.price).toFixed(2)}</td>
+              <td>${Number(row.units_sold).toLocaleString()}</td>
+              <td>${row.competitor_price !== null ? '$' + Number(row.competitor_price).toFixed(2) : '-'}</td>
+              <td>${row.promo !== null ? (row.promo ? 'Yes' : 'No') : '-'}</td>
+              <td>${row.unit_cost !== null ? '$' + Number(row.unit_cost).toFixed(2) : '-'}</td>
+              <td>${row.category || '-'}</td>
+            `;
+            previewTableBody.appendChild(tr);
+          });
+
+          // Bind trigger updates
+          [filterStartDate, filterEndDate, filterExcludeInsufficient, filterExcludeMissingOptional].forEach(el => {
+            el.removeEventListener('change', updateFilterStats);
+            el.addEventListener('change', updateFilterStats);
+          });
+
+          document.querySelectorAll('input[name="duplicate-handling"]').forEach(radio => {
+            radio.removeEventListener('change', updateFilterStats);
+            radio.addEventListener('change', updateFilterStats);
+          });
+
+          // Run active count
+          updateFilterStats();
+        })
+        .catch(err => {
+          console.error("Error setting up filter step:", err);
+          alert("Error loading dataset preview details.");
+        });
+    }
+
+    function getFilterPayload() {
+      // Gather active category values
+      const categories = [];
+      filterCategoriesGrid.querySelectorAll('input:checked').forEach(input => {
+        categories.push(input.value);
+      });
+
+      const dupHandling = document.querySelector('input[name="duplicate-handling"]:checked').value;
+
+      return {
+        start_date: filterStartDate.value || null,
+        end_date: filterEndDate.value || null,
+        categories: categories,
+        exclude_insufficient: filterExcludeInsufficient.checked,
+        exclude_missing_optional: filterExcludeMissingOptional.checked,
+        duplicate_handling: dupHandling
+      };
+    }
+
+    function updateFilterStats() {
+      const payload = getFilterPayload();
+      filterStatSummary.textContent = "Recalculating observations...";
+
+      fetch(`/api/datasets/${currentDatasetId}/preview-stats`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(data => {
+        filterStatSummary.textContent = `${data.row_count.toLocaleString()} rows across ${data.sku_count.toLocaleString()} SKUs will be analyzed.`;
+      })
+      .catch(err => {
+        console.error("Error updating filter statistics:", err);
+      });
+    }
+
+    btnFilterBackValidation.addEventListener('click', () => {
+      showIntakeStep('validation');
+    });
+
+    btnFilterRunAnalysis.addEventListener('click', () => {
+      triggerAnalysis();
+    });
+
+    // Step 4: Regression Trigger
+    function triggerAnalysis() {
+      const payload = getFilterPayload();
+      showIntakeStep('progress');
+      analysisProgressBar.style.width = '0%';
+      analysisStatusText.textContent = "Triggering OLS regressions on background worker...";
+
+      fetch(`/api/datasets/${currentDatasetId}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(async r => {
+        if (!r.ok) {
+          const errData = await r.json();
+          throw new Error(errData.detail || "Failed to start regression analysis job.");
+        }
+        return r.json();
+      })
+      .then(res => {
+        startAnalysisPolling();
+      })
+      .catch(err => {
+        console.error(err);
+        alert(err.message);
+        showIntakeStep('filter');
+      });
+    }
+
+    function startAnalysisPolling() {
+      if (analysisTimer) clearInterval(analysisTimer);
+
+      analysisTimer = setInterval(() => {
+        fetch(`/api/datasets/${currentDatasetId}`)
+          .then(r => r.json())
+          .then(data => {
+            if (data.status === 'failed') {
+              clearInterval(analysisTimer);
+              alert("Regression analysis job failed: " + (data.error_message || "Unknown error"));
+              showIntakeStep('filter');
+            } else if (data.status === 'complete') {
+              clearInterval(analysisTimer);
+              loadAnalysisResults();
+            } else {
+              analysisProgressBar.style.width = data.progress_pct + '%';
+              analysisStatusText.textContent = `Estimating OLS elasticity regressions: ${data.progress_pct}%`;
+            }
+          })
+          .catch(err => {
+            clearInterval(analysisTimer);
+            console.error("Error polling analysis progress:", err);
+          });
+      }, 1000);
+    }
+
+    // Step 5: Regression Results View
+    function loadAnalysisResults() {
+      showIntakeStep('results');
+      resultsTableBody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>Fetching regression outputs...</td></tr>";
+
+      fetch(`/api/datasets/${currentDatasetId}/results`)
+        .then(r => r.json())
+        .then(data => {
+          resultsStatAvgPed.textContent = data.avg_elasticity !== null 
+            ? Number(data.avg_elasticity).toFixed(3) 
+            : 'N/A';
+          resultsStatSkus.textContent = `${data.analyzed_sku_count.toLocaleString()}`;
+          resultsStatRows.textContent = data.analyzed_row_count.toLocaleString();
+
+          resultsTableBody.innerHTML = "";
+          if (data.results && data.results.length > 0) {
+            data.results.forEach(res => {
+              const tr = document.createElement('tr');
+              
+              const coefStr = res.elasticity_coef !== null ? Number(res.elasticity_coef).toFixed(3) : '-';
+              const errStr = res.std_err !== null ? Number(res.std_err).toFixed(3) : '-';
+              const pValStr = res.p_value !== null ? Number(res.p_value).toFixed(4) : '-';
+              const rSqStr = res.r_squared !== null ? Number(res.r_squared).toFixed(3) : '-';
+              
+              let confClass = 'failed';
+              if (res.confidence_flag === 'high confidence') confClass = 'high';
+              else if (res.confidence_flag === 'low confidence') confClass = 'low';
+
+              tr.innerHTML = `
+                <td><strong>${res.sku}</strong></td>
+                <td style="color: ${res.elasticity_coef < 0 ? 'var(--flame)' : 'var(--teal-light)'}; font-weight: 600;">${coefStr}</td>
+                <td>${errStr}</td>
+                <td>${pValStr}</td>
+                <td>${rSqStr}</td>
+                <td><span class="conf-badge ${confClass}">${res.confidence_flag}</span></td>
+                <td style="font-size: 0.72rem; color: var(--cream-dark); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  ${res.error_message || '-'}
+                </td>
+              `;
+              resultsTableBody.appendChild(tr);
+            });
+          } else {
+            resultsTableBody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>No regression results found.</td></tr>";
+          }
+        })
+        .catch(err => {
+          console.error("Error retrieving analysis results:", err);
+          alert("Error fetching regression results.");
+        });
+    }
+
+    btnResultsBackFilter.addEventListener('click', () => {
+      loadFilterStep();
+    });
+
+    btnResultsNewUpload.addEventListener('click', () => {
+      showIntakeStep('upload');
+      uploadProgressContainer.style.display = 'none';
+      uploadStatusText.style.display = 'none';
+      fileInput.value = "";
+    });
+
+    // ----------------------------------------------------
+    // 9. ENGINE COLD-START ENGINE WAKE-UP CHECK
+    // ----------------------------------------------------
+    const wakeupBanner = document.getElementById('engine-wakeup-banner');
+    const wakeupTimeout = setTimeout(() => {
+      wakeupBanner.style.display = 'flex';
+    }, 450);
+
+    fetch('/api/health')
+      .then(r => r.json())
+      .then(data => {
+        clearTimeout(wakeupTimeout);
+        wakeupBanner.style.display = 'none';
+        console.log("[HEALTH] Pricing engine active.");
+      })
+      .catch(err => {
+        console.error("[HEALTH] Pricing engine cold start or offline:", err);
+      });
+  </script>
+</body>
+</html>
